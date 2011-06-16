@@ -1,0 +1,80 @@
+text{
+	text-rendering:optimizeLegibility;/*geometricPrecision;*/
+	font-size:12px;
+	font-style:normal;
+	font-weight:normal;
+	text-anchor:start;
+	fill:#000000;
+	fill-opacity:1;
+	font-family:DejaVu Sans
+}
+text.static{
+	text-decoration:underline;
+}
+text.abstract, text.titulo-abstract{
+	font-style:oblique;
+}
+text.centrado, text.titulo, text.titulo-abstract{
+	text-anchor:middle;
+}
+text.titulo, text.titulo-abstract{
+	font-size:14px;
+	font-weight:bold;
+}
+
+line, polyline, path, rect{
+	stroke:#000000;
+	stroke-opacity:1;
+	stroke-width:1;
+	stroke-linecap:round;
+	stroke-linejoin:round;
+	fill:none;
+	fill-opacity:1;
+	fill-rule:nonzero;
+	shape-rendering:geometricPrecision
+}
+
+path{
+	fill:#E0E0E0
+}
+
+.titulo-estilo1, .parameters-estilo1{
+	fill:url(defs.svg#gradientInicialFinalV1)
+}
+.contenido-estilo1{
+	fill:url(defs.svg#gradientInicialFinalH1)
+}
+
+.titulo-estilo2, .parameters-estilo2{
+	fill:url(defs.svg#gradientInicialFinalV2)
+}
+.contenido-estilo2{
+	fill:url(defs.svg#gradientInicialFinalH2)
+}
+
+.titulo-estilo3{
+	fill:url(defs.svg#gradientInicialFinalV3)
+}
+.contenido-estilo3{
+	fill:url(defs.svg#gradientInicialFinalH3)
+}
+
+.parameters-estilo1, .parameters-estilo2{
+	stroke-width:2;
+	stroke-dasharray: 4, 4;
+}
+
+.hierarchy-conector{
+	fill:none;
+	marker-start:url(defs.svg#MarkerHierarchy)
+}
+
+.container-conector{
+	fill:none;
+	marker-start:url(defs.svg#MarkerContainer)
+}
+
+.interface-conector{
+	fill:none;
+	marker-end:url(defs.svg#MarkerInteface)
+}

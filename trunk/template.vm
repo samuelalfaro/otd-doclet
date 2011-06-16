@@ -1,0 +1,15 @@
+#macro( b $algo )<b>$algo</b>#end
+#macro( i $algo )<i>$algo</i>#end
+#macro( u $algo )<u>$algo</u>#end
+#macro( tt $algo )<tt>$algo</tt>#end
+#macro( nombre_apellidos $persona )#*
+	*##b( $persona.Nombre )#*
+	*##if( $persona.Apellidos )#*
+		*# $Tools.uperCase( $persona.Apellidos ) $Math.sin( $Tools.stringLen( $persona.Apellidos ) )#*
+	*##end
+#end
+#macro( clase $algo )#set( $class = $algo.getClass() )$class.getSimpleName()#end
+We are using #u( $project ) $name to render this.##
+#foreach( $persona in $personas )
+#*	*#${newLine}Hola #clase( $persona ) #nombre_apellidos( $persona ).##
+#end
