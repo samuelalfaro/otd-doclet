@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:svg="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	version="1.1">
+	<defs>
+		<linearGradient id="gradientInicialFinal1">
+			<stop id="colorInicial" offset="0.0" style="stop-color:#208020; stop-opacity:1;"/>
+			<stop id="colorMedio"   offset="0.5" style="stop-color:#D0FF80; stop-opacity:1;"/>
+			<stop id="colorFinal"   offset="1.0" style="stop-color:#FFFFFF; stop-opacity:1;"/>
+		</linearGradient>
+		<linearGradient id="gradientInicialFinalH1" xlink:href="#gradientInicialFinal1" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="60" y2="0"/>
+		<linearGradient id="gradientInicialFinalV1" xlink:href="#gradientInicialFinal1" x1="0%" y1="0%" x2="100%" y2="125%"/>
+
+		<linearGradient id="gradientInicialFinal2">
+			<stop id="colorInicial" offset="0.0" style="stop-color:#404080; stop-opacity:1;"/>
+			<stop id="colorMedio"   offset="0.5" style="stop-color:#C0E0FF; stop-opacity:1;"/>
+			<stop id="colorFinal"   offset="1.0" style="stop-color:#FFFFFF; stop-opacity:1;"/>
+		</linearGradient>
+		<linearGradient id="gradientInicialFinalH2" xlink:href="#gradientInicialFinal2" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="60" y2="0"/>
+		<linearGradient id="gradientInicialFinalV2" xlink:href="#gradientInicialFinal2" x1="0%" y1="0%" x2="100%" y2="125%"/>
+		
+		<linearGradient id="gradientInicialFinal3">
+			<stop id="colorInicial" offset="0.0" style="stop-color:#A02040; stop-opacity:1;"/>
+			<stop id="colorMedio"   offset="0.5" style="stop-color:#F0C080; stop-opacity:1;"/>
+			<stop id="colorFinal"   offset="1.0" style="stop-color:#FFFFFF; stop-opacity:1;"/>
+		</linearGradient>
+		<linearGradient id="gradientInicialFinalH3" xlink:href="#gradientInicialFinal3" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="60" y2="0"/>
+		<linearGradient id="gradientInicialFinalV3" xlink:href="#gradientInicialFinal3" x1="0%" y1="0%" x2="100%" y2="125%"/>
+		
+		<filter id="SpecShadow1" filterUnits="objectBoundingBox" x="-5%" y="-5%" width="110%" height="110%">
+			<feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur"/>
+			<feSpecularLighting in="blur" result="specOut"
+				surfaceScale="1.5"
+				specularConstant=".75" 
+				specularExponent="64" lighting-color="#bbffbb">
+				<fePointLight x="-100" y="-150" z="400"/>
+			</feSpecularLighting>
+			<feComposite in="specOut" in2="SourceAlpha" operator="in" result="specOut"/>
+			<feComposite in="SourceGraphic" in2="specOut" result="litPaint"
+				operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>
+			<feOffset in="blur" dx="2" dy="2" result="offsetBlur"/>
+			<feMerge>
+				<feMergeNode in="offsetBlur"/>
+				<feMergeNode in="litPaint"/>
+			</feMerge>
+		</filter>
+		<filter id="SpecShadow2" filterUnits="objectBoundingBox" x="-15%" y="-15%" width="140%" height="140%">
+			<feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur"/>
+			<feSpecularLighting in="blur" result="specOut"
+				surfaceScale="1.5"
+				specularConstant=".75" 
+				specularExponent="64" lighting-color="#bbffbb">
+				<fePointLight x="-100" y="-150" z="400"/>
+			</feSpecularLighting>
+			<feComposite in="specOut" in2="SourceAlpha" operator="in" result="specOut"/>
+			<feComposite in="SourceGraphic" in2="specOut" result="litPaint"
+				operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>
+			<feOffset in="blur" dx="2" dy="2" result="offsetBlur"/>
+			<feMerge>
+				<feMergeNode in="offsetBlur"/>
+				<feMergeNode in="litPaint"/>
+			</feMerge>
+		</filter>
+		<filter id="SpecShadow3" filterUnits="objectBoundingBox" x="-15%" y="-15%" width="140%" height="140%">
+			<feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur"/>
+			<feSpecularLighting in="blur" result="specOut"
+				surfaceScale="1.5"
+				specularConstant=".75" 
+				specularExponent="64" lighting-color="#bbffbb">
+				<fePointLight x="-150" y="100" z="400"/>
+			</feSpecularLighting>
+			<feComposite in="specOut" in2="SourceAlpha" operator="in" result="specOut"/>
+			<feComposite in="SourceGraphic" in2="specOut" result="litPaint"
+				operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>
+			<feOffset in="blur" dx="2" dy="-2" result="offsetBlur"/>
+			<feMerge>
+				<feMergeNode in="offsetBlur"/>
+				<feMergeNode in="litPaint"/>
+			</feMerge>
+		</filter>
+		<path id="MarkerIntefaceShape"
+			d="M -10,0 A 10,10 0 0,1 10,0 A 10,10 0 0,1 -10,0 z"
+			style="
+					stroke:#000000;
+					stroke-opacity:1;
+					stroke-width:1;
+					stroke-linecap:round;
+					stroke-linejoin:round;
+					fill:url(#gradientInicialFinalV2);
+					fill-opacity:1;
+					fill-rule:nonzero;
+					shape-rendering:geometricPrecision"
+			filter="url(#SpecShadow2)"/>
+		<marker id="MarkerInteface"
+			viewBox="-11 -11 26 26" refX="10" refY="0" 
+			markerUnits="userSpaceOnUse"
+			markerWidth="26" markerHeight="26"
+			orient="auto">
+			<use xlink:href="#MarkerIntefaceShape"/>
+		</marker>
+		<path id="MarkerHierarchyShape"
+			d="M -10,0 10,10 10,-10 Z"
+			style="
+				stroke:#000000;
+				stroke-opacity:1;
+				stroke-width:1;
+				stroke-linecap:butt;
+				stroke-linejoin:miter;
+				stroke-miterlimit:4;
+				fill:#E0E0E0;
+				fill-opacity:1;
+				fill-rule:nonzero;
+				shape-rendering:geometricPrecision"
+			filter="url(#SpecShadow3)"/>
+		<marker id="MarkerHierarchy"
+			viewBox="-11 -15 26 26" refX="-10" refY="0" 
+			markerUnits="userSpaceOnUse"
+			markerWidth="26" markerHeight="26"
+			orient="auto">
+			<use xlink:href="#MarkerHierarchyShape"/>
+		</marker>
+		<g id="MarkerContainerShape" filter="url(#SpecShadow2)">
+			<path d="M -10,0 A 10,10 0 0,1 10,0 A 10,10 0 0,1 -10,0 z"
+				style="
+					stroke:#000000;
+					stroke-opacity:1;
+					stroke-width:1;
+					stroke-linecap:round;
+					stroke-linejoin:round;
+					fill:#E0E0E0;
+					fill-opacity:1;
+					fill-rule:nonzero;
+					shape-rendering:geometricPrecision"/>
+			<line x1="-10" y1="0" x2="10" y2="0" style="stroke:#000000;stroke-width:1;"/>
+			<line x1="0" y1="-10" x2="0" y2="10" style="stroke:#000000;stroke-width:1;"/>
+		</g>
+		<marker id="MarkerContainer"
+			viewBox="-11 -11 26 26" refX="-10" refY="0" 
+			markerUnits="userSpaceOnUse"
+			markerWidth="26" markerHeight="26"
+			orient="auto">
+			<use xlink:href="#MarkerContainerShape"/>
+		</marker>
+		
+		<g id="EnumConstant">
+			<use                          transform="translate(8, 8) scale(0.3333)" xlink:href="bullets.svg#PublicStaticField"/>
+			<use                          transform="translate(-2, 8) scale(0.25)" xlink:href="bullets.svg#Lock"/>
+		</g>
+		
+		<use id="PublicStaticField"       transform="translate(8, 8) scale(0.3333)" xlink:href="bullets.svg#PublicStaticField"/>
+		<use id="ProtectedStaticField"    transform="translate(8, 8) scale(0.3333)" xlink:href="bullets.svg#ProtectedStaticField"/>
+		<use id="PackageStaticField"      transform="translate(8, 8) scale(0.3333)" xlink:href="bullets.svg#PackageStaticField"/>
+		<use id="PrivateStaticField"      transform="translate(8, 8) scale(0.3333)" xlink:href="bullets.svg#PrivateStaticField"/>
+		
+		<use id="PublicField"             transform="translate(8, 8) scale(0.3333)" xlink:href="bullets.svg#PublicField"/>
+		<use id="ProtectedField"          transform="translate(8, 8) scale(0.3333)" xlink:href="bullets.svg#ProtectedField"/>
+		<use id="PackageField"            transform="translate(8, 8) scale(0.3333)" xlink:href="bullets.svg#PackageField"/>
+		<use id="PrivateField"            transform="translate(8, 8) scale(0.3333)" xlink:href="bullets.svg#PrivateField"/>
+		
+		<use id="PublicConstructor"       transform="translate(8, 8) scale(0.3333)" xlink:href="bullets.svg#PublicConstructor"/>
+		<use id="ProtectedConstructor"    transform="translate(8, 8) scale(0.3333)" xlink:href="bullets.svg#ProtectedConstructor"/>
+		<use id="PackageConstructor"      transform="translate(8, 8) scale(0.3333)" xlink:href="bullets.svg#PackageConstructor"/>
+		<use id="PrivateConstructor"      transform="translate(8, 8) scale(0.3333)" xlink:href="bullets.svg#PrivateConstructor"/>
+		
+		<use id="PublicStaticMethod"      transform="translate(8, 8) scale(0.3333)" xlink:href="bullets.svg#PublicStaticMethod"/>
+		<use id="ProtectedStaticMethod"   transform="translate(8, 8) scale(0.3333)" xlink:href="bullets.svg#ProtectedStaticMethod"/>
+		<use id="PackageStaticMethod"     transform="translate(8, 8) scale(0.3333)" xlink:href="bullets.svg#PackageStaticMethod"/>
+		<use id="PrivateStaticMethod"     transform="translate(8, 8) scale(0.3333)" xlink:href="bullets.svg#PrivateStaticMethod"/>
+		
+		<use id="PublicMethod"            transform="translate(8, 8) scale(0.3333)" xlink:href="bullets.svg#PublicMethod"/>
+		<use id="ProtectedMethod"         transform="translate(8, 8) scale(0.3333)" xlink:href="bullets.svg#ProtectedMethod"/>
+		<use id="PackageMethod"           transform="translate(8, 8) scale(0.3333)" xlink:href="bullets.svg#PackageMethod"/>
+		<use id="PrivateMethod"           transform="translate(8, 8) scale(0.3333)" xlink:href="bullets.svg#PrivateMethod"/>
+	
+		<use id="PublicAbstractMethod"    transform="translate(8, 8) scale(0.3333)" xlink:href="bullets.svg#PublicAbstractMethod"/>
+		<use id="ProtectedAbstractMethod" transform="translate(8, 8) scale(0.3333)" xlink:href="bullets.svg#ProtectedAbstractMethod"/>
+		<use id="PackageAbstractMethod"   transform="translate(8, 8) scale(0.3333)" xlink:href="bullets.svg#PackageAbstractMethod"/>
+	
+		<use id="Transient"               transform="translate(-2,-2) scale(0.25)" xlink:href="bullets.svg#Bubble"/>
+		<use id="Volatile"                transform="translate(10,-2) scale(0.25)" xlink:href="bullets.svg#Feather"/>
+		<use id="Native"                  transform="translate(-2,-2) scale(0.25)" xlink:href="bullets.svg#Gears"/>
+		<use id="Strictfp"                transform="translate(10,-2) scale(0.25)" xlink:href="bullets.svg#Pi"/>
+		<use id="Final"                   transform="translate(-2, 8) scale(0.25)" xlink:href="bullets.svg#Lock"/>
+		<use id="Synchronized"            transform="translate(10, 8) scale(0.25)" xlink:href="bullets.svg#Clock"/>
+	
+	</defs>
+</svg>

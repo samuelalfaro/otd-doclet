@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Class-Path: . lib/batik-anim.jar lib/batik-awt-util.jar lib/batik-brid
+ ge.jar lib/batik-codec.jar lib/batik-css.jar lib/batik-dom.jar lib/ba
+ tik-extension.jar lib/batik-ext.jar lib/batik-gui-util.jar lib/batik-
+ gvt.jar lib/batik-parser.jar lib/batik-script.jar lib/batik-svg-dom.j
+ ar lib/batik-svggen.jar lib/batik-swing.jar lib/batik-transcoder.jar 
+ lib/batik-util.jar lib/batik-xml.jar lib/htmlcleaner-2.2.jar lib/js.j
+ ar lib/pdf-transcoder.jar lib/velocity-1.7-dep.jar lib/xalan-2.6.0.ja
+ r lib/xerces_2_5_0.jar lib/xml-apis-ext.jar lib/xml-apis.jar
