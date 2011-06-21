@@ -21,56 +21,21 @@
  */
 package pruebas;
 
+import java.io.IOException;
+
 import org.sam.xml.XMLWriter;
 
 public class PruebaXMLWriter{
 
-	public static void main( String... args ){
-		XMLWriter writer = new XMLWriter( System.out, 4 );
-
-		writer.openNode( "text:p" );
-		writer.addAttribute( "text:style-name", "Estilo" );
-		writer.write( "bla bla bla bla" );
-		writer.emptyNode( "text:line-break" );
-		writer.write( "bla bla bla 2" );
-		writer.closeNode();
+	public static void main( String... args ) throws IOException{
+		XMLWriter writer = new XMLWriter( (Appendable)System.out, 4 );
 		
 		writer.openNode( "text:p" );
-		writer.addAttribute( "text:style-name", "Estilo" );
+		writer.addAttribute( "text:style-name", "<&~Estilo>" );
+		writer.write( "bla bla bla bla << \" ' > &" );
 		writer.emptyNode( "text:line-break" );
-		writer.openNode( "text:p" );
+		writer.writeCDATA( "bla bla bla 2" );
+		writer.insert( "<bla>bla bla bla</bla>" );
 		writer.closeNode();
-		writer.openNode( "otro" );
-		writer.openNode( "text:p" );
-		writer.write( "bla bla bla 2" );
-		writer.closeNode();
-		writer.closeNode();
-		writer.write( "bla bla bla 2" );
-		writer.closeNode();
-		
-		writer.openNode( "text:p" );
-		writer.openNode( "text:p" );
-		writer.openNode( "text:p" );
-		writer.openNode( "text:p" );
-		writer.openNode( "text:p" );
-		writer.closeNode();
-		writer.closeNode();
-		writer.closeNode();
-		writer.openNode( "text:p" );
-		writer.openNode( "text:p" );
-		writer.openNode( "text:p" );
-		writer.openNode( "text:p" );
-		writer.write( "bla bla bla bla" );
-		writer.closeNode();
-		writer.closeNode();
-		writer.closeNode();
-		writer.closeNode();
-		writer.closeNode();
-		writer.openNode( "text:p" );
-		writer.openNode( "text:p" );
-		writer.closeNode();
-		writer.closeNode();
-		writer.closeNode();
-
 	}
 }

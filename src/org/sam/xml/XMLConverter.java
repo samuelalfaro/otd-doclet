@@ -21,6 +21,8 @@
  */
 package org.sam.xml;
 
+import java.io.IOException;
+
 /**
  * 
  */
@@ -53,7 +55,7 @@ public class XMLConverter{
 	 * Method write.
 	 * @param t T
 	 */
-	public <T>void write( T t ){
+	public <T>void write( T t ) throws IOException{
 		mapper.getRecorder( t.getClass() ).record( t, writer, mapper );
 	}
 

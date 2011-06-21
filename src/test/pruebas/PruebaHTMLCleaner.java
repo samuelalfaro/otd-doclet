@@ -27,6 +27,9 @@ import org.htmlcleaner.CleanerProperties;
 import org.htmlcleaner.ContentNode;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
+import org.sam.html.Cleaner;
+import org.sam.html.HTMLFormater;
+import org.sam.html.HTMLSerializer;
 
 /**
  * 
@@ -96,9 +99,11 @@ public class PruebaHTMLCleaner{
 	 * @param args
 	 */
 	public static void main( String[] args ){
-		System.out.println( clean(
-				"hola <u>qué tal?<b>muy bien</u> tocando <br>\n" +
-				"los cojones</b> bla <u>bla <i>bla</u> ldsfas <a href=\"www.dir.org\" fasdf=\"fasdhfkj\">link</a>"
-		));
+		String html =
+			"hola <u>qué tal?<b>muy bien</u> tocando <br>\n" +
+			"los cojones</b> bla <u>bla <i>bla</u> ldsfas <a href=\"www.dir.org\" fasdf=\"fasdhfkj\">link</a>";
+		HTMLFormater FORMATER = new Cleaner( HTMLSerializer.Default );
+		System.out.println( clean( html ) );
+		System.out.println( FORMATER.format( html ) );
 	}
 }
