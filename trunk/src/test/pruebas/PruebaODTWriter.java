@@ -1,5 +1,5 @@
 /* 
- * Recorder.java
+ * PruebaODTWriter.java
  * 
  * Copyright (c) 2011 Samuel Alfaro Jiménez <samuelalfaro at gmail dot com>.
  * All rights reserved.
@@ -19,20 +19,27 @@
  * You should have received a copy of the GNU General Public License
  * along with odf-doclet.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.sam.xml;
+package pruebas;
 
 import java.io.IOException;
 
-/**
- */
-public interface Recorder<T>{
-	
-	/**
-	 * Method record.
-	 * @param t T
-	 * @param writer XMLWriter
-	 * @param maper RecordersMapper
-	 */
-	void record(T t, XMLWriter writer, RecordersMapper maper) throws IOException;
-	
+import org.sam.odt_doclet.bindings.ClassBindingFactory;
+import org.sam.odt_doclet.bindings.Recorders;
+import org.sam.xml.XMLConverter;
+import org.sam.xml.XMLWriter;
+
+public class PruebaODTWriter{
+
+	public static void main( String... args ) throws IOException{
+		
+		Class<?> clazz = ClaseDePrueba.class;
+		
+		XMLConverter converter = new XMLConverter();
+		converter.setWriter( new XMLWriter( (Appendable)System.out, 4 ) );
+		
+		Recorders.register( Recorders.Mode.ODT, converter );
+		
+		converter.write( ClassBindingFactory.createBinding( clazz ) );
+
+	}
 }

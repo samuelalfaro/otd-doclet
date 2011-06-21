@@ -213,10 +213,13 @@ public class ClaseDePrueba<E> {
 	
 	/**
 	 * Documentación del método {@code metodo3}.
-	 * @param a3 tercer argumento.
+	 * 
 	 * @param <T> Documentación del parámetro genérico T del método.
-	 * @return valor devuelto.
 	 * @param <U> Documentación del parámetro genérico U del método.
+	 * @param a1 primer argumento.
+	 * @param a2 segundo argumento.
+	 * @param a3 tercer argumento.
+	 * @return valor devuelto.
 	 */
 	private native <T extends Number & Cloneable, U> E metodo3(T a1, Map<? super Number, ? extends InerClass> a2, U... a3);
 	

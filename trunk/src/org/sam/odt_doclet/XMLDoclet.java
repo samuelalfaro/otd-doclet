@@ -21,6 +21,8 @@
  */
 package org.sam.odt_doclet;
 
+import java.io.IOException;
+
 import org.sam.odt_doclet.bindings.ClassBindingFactory;
 import org.sam.odt_doclet.bindings.Recorders;
 import org.sam.xml.XMLConverter;
@@ -64,11 +66,15 @@ public final class XMLDoclet{
 		ClassDoc[] classes = root.classes();
 
 		XMLConverter converter = new XMLConverter();
-		Recorders.register( Recorders.Mode.XML, converter );
-		converter.setWriter( new XMLWriter( System.out, true ) );
+		Recorders.register( Recorders.Mode.ODT, converter );
+		converter.setWriter( new XMLWriter( (Appendable)System.out, true ) );
 
 		for( ClassDoc classDoc: classes )
-			converter.write( ClassBindingFactory.createBinding( classDoc ) );
+			try{
+				converter.write( ClassBindingFactory.createBinding( classDoc ) );
+			}catch( IOException e ){
+				e.printStackTrace();
+			}
 
 		return true;
 	}

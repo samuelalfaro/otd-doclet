@@ -21,8 +21,9 @@
  */
 package org.sam.xml;
 
+import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -32,25 +33,16 @@ import java.util.Deque;
  */
 public final class XMLWriter{
 	
-	/*
-	private static class StringPrintStream extends PrintStream{
-		StringPrintStream(){
-			super( new java.io.ByteArrayOutputStream() );
+	private static Appendable getAppendable( OutputStream out ){
+		if( Appendable.class.isAssignableFrom( out.getClass() )  )
+			return (Appendable)out;
+		try{
+			return new OutputStreamWriter( out, "UTF-8" );
+		}catch( UnsupportedEncodingException ignorada ){
+			assert ( false ): ignorada.toString();
+			return null;
 		}
-		
-		public String toString(String enconding) throws java.io.IOException{
-			out.flush();
-			return ((java.io.ByteArrayOutputStream)out).toString(enconding);
-		}
-		
-		public String toString(){
-			try {
-				return toString("UTF8");
-			} catch (java.io.IOException e) {
-				return ((java.io.ByteArrayOutputStream)out).toString();
-			}
-		}
-	}//*/
+	}
 	
 	private interface TabsManager{
 		
@@ -81,7 +73,7 @@ public final class XMLWriter{
 		};
 		
 		/**
-		 * {@code TabsManager} que gestiona las tabulaciones mediante tabuladores.
+		 * {@code TabsManager} que tabula el contenido usando tabuladores.
 		 */
 		static final class Tabulate implements TabsManager{
 			
@@ -113,7 +105,7 @@ public final class XMLWriter{
 		}
 		
 		/**
-		 * {@code TabsManager} que gestiona las tabulaciones mediante tabuladores.
+		 * {@code TabsManager} que tabula el contenido usando espacios.
 		 */
 		static final class Spaces implements TabsManager{
 			
@@ -153,21 +145,75 @@ public final class XMLWriter{
 		}
 		
 		/**
-		 * Añade un tabulador.
+		 * Añade una tabulación.
 		 */
 		void add();
 		
 		/**
-		 * Elimina un tabulador.
+		 * Elimina una tabulación.
 		 */
 		void remove();
 
 		/**
-		 * @return Los tabuladores del nivel actual.
+		 * @return La cadena con las tabulaciones del nivel actual.
 		 */
 		String get();
 	}
 	
+	private interface StringDigester{
+		
+		StringDigester Default = new StringDigester(){
+			public void digestString( String content, Appendable out ) throws IOException{
+				out.append( content );
+			}
+		};
+
+		StringDigester CDATA = new StringDigester(){
+			public void digestString( String content, Appendable out ) throws IOException{
+				out.append( "<![CDATA[" ).append( content ).append( "]]>" );
+			}
+		};
+
+		StringDigester XMLCharsFilter = new StringDigester(){
+
+			private final char[] charArray = new char[8192];
+
+			public void digestString( String content, Appendable out ) throws IOException{
+
+				int remainder = content.length();
+				int srcBegin = 0;
+
+				while( remainder > 0 ){
+					int copiedChars = Math.min( remainder, charArray.length );
+					content.getChars( srcBegin, srcBegin + copiedChars, charArray, 0 );
+					for( int i = 0; i < copiedChars; i++ )
+						switch( charArray[i] ){
+						case '&':
+							out.append( "&amp;" );
+							break;
+						case '<':
+							out.append( "&lt;" );
+							break;
+						case '>':
+							out.append( "&gt;" );
+							break;
+						case '\"':
+							out.append( "&quot;" );
+							break;
+						case '\'':
+							out.append( "&apos;" );
+							break;
+						default:
+							out.append( charArray[i] );
+						}
+					remainder -= copiedChars;
+				}
+			}
+		};
+		
+		void digestString( String content, Appendable out ) throws IOException;
+	}
+
 	private static class Node{
 		public final String name;
 		public boolean isSingleLineNode;
@@ -178,25 +224,18 @@ public final class XMLWriter{
 		}
 	}
 	
-	private static PrintStream toPrintStream( OutputStream out ){
-		if( out instanceof PrintStream )
-			return (PrintStream)out;
-		try{
-			return new PrintStream( out, false, "UTF-8" );
-		}catch( UnsupportedEncodingException ignorada ){
-			assert ( false ): ignorada.toString();
-			return null;
-		}
-	}
-	
-	private final PrintStream out;
-	private final Deque<Node> nodeStack;
+	private final Appendable   out;
+	private final Deque<Node>  nodeStack;
 	private final StringBuffer attributes;
-	private final TabsManager tabs;
-	private final String eol;
+	private final TabsManager  tabs;
+	private final String       eol;
+	
+	private transient boolean isFirstCall       = true;
+	private transient boolean isClosedStartNode = true;
+	private transient boolean hasContent        = false;
 
-	private XMLWriter( OutputStream out, TabsManager manager ){
-		this.out = toPrintStream( out );
+	private XMLWriter( Appendable out, TabsManager manager ){
+		this.out = out;
 		this.nodeStack = new ArrayDeque<Node>();
 		this.attributes = new StringBuffer( 512 );
 		this.attributes.setLength( 0 );
@@ -206,30 +245,59 @@ public final class XMLWriter{
 	
 	/**
 	 * Constructor for XMLWriter.
-	 * @param out OutputStream
-	 * @param tabulate boolean
+	 * @param out
+	 * @param tabulate
 	 */
-	public XMLWriter( OutputStream out, boolean tabulate ){
+	public XMLWriter( Appendable out, boolean tabulate ){
 		this( out, tabulate ? new TabsManager.Tabulate(): TabsManager.Default );
 	}
 
-	public XMLWriter( OutputStream out, int tabulateSpaces ){
+	/**
+	 * Constructor for XMLWriter.
+	 * @param out
+	 * @param tabulateSpaces
+	 */
+	public XMLWriter( Appendable out, int tabulateSpaces ){
 		this( out, tabulateSpaces > 0 ? new TabsManager.Spaces( tabulateSpaces ): TabsManager.Default );
+	}
+
+	/**
+	 * Constructor for XMLWriter.
+	 * @param out
+	 */
+	public XMLWriter( Appendable out ){
+		this( out, TabsManager.Default );
+	} 
+	
+	/**
+	 * Constructor for XMLWriter.
+	 * @param out
+	 * @param tabulate
+	 */
+	public XMLWriter( OutputStream out, boolean tabulate ){
+		this( getAppendable( out ), tabulate ? new TabsManager.Tabulate(): TabsManager.Default );
+	}
+
+	/**
+	 * Constructor for XMLWriter.
+	 * @param out
+	 * @param tabulateSpaces
+	 */
+	public XMLWriter( OutputStream out, int tabulateSpaces ){
+		this( getAppendable( out ), tabulateSpaces > 0 ? new TabsManager.Spaces( tabulateSpaces ): TabsManager.Default );
 	}
 	
 	/**
 	 * Constructor for XMLWriter.
-	 * @param out OutputStream
+	 * @param out
 	 */
 	public XMLWriter( OutputStream out ){
-		this( out, false );
-	}
+		this( getAppendable( out ), TabsManager.Default );
+	} 
 	
-	private boolean isFirstCall       = true;
-	private boolean isClosedStartNode = true;
-	private boolean hasContent        = false;
 	
-	private void flushAttributes(){
+	
+	private void flushAttributes() throws IOException{
 		if( attributes.length() > 0 ){
 			out.append( attributes.toString() );
 			attributes.setLength( 0 );
@@ -240,7 +308,7 @@ public final class XMLWriter{
 	 * Method openNode.
 	 * @param nodeName String
 	 */
-	public void openNode( String nodeName ){
+	public void openNode( String nodeName ) throws IOException{
 		if( !isClosedStartNode ){
 			flushAttributes();
 			out.append( '>' );
@@ -262,76 +330,104 @@ public final class XMLWriter{
 	 * @param name String
 	 * @param value String
 	 */
-	public void addAttribute(String name, String value) {
+	public void addAttribute( String name, String value ) throws IOException{
 		if( isClosedStartNode )
 			throw new IllegalStateException();
-		attributes.append(' ').append(name).append("=\"").append(value).append('\"');
+		attributes.append( ' ' ).append( name ).append( "=\"" );
+		StringDigester.XMLCharsFilter.digestString( value, attributes );
+		attributes.append( '\"' );
 	}
 	
 	/**
 	 * Method addAttribute.
 	 * @param name String
 	 * @param value boolean
+	 * @throws IOException 
 	 */
-	public void addAttribute(String name, boolean value) {
+	public void addAttribute( String name, boolean value ) throws IOException{
 		if( isClosedStartNode )
 			throw new IllegalStateException();
-		attributes.append(' ').append(name).append("=\"").append(value).append('\"');
+		attributes.append( ' ' ).append( name ).append( "=\"" ).append( value ).append( '\"' );
 	}
 	
 	/**
 	 * Method addAttribute.
 	 * @param name String
 	 * @param value char
+	 * @throws IOException 
 	 */
-	public void addAttribute(String name, char value) {
+	public void addAttribute( String name, char value ) throws IOException{
 		if( isClosedStartNode )
 			throw new IllegalStateException();
-		attributes.append(' ').append(name).append("=\"").append(value).append('\"');
+		attributes.append( ' ' ).append( name ).append( "=\"" );
+		switch( value ){
+		case '&':
+			attributes.append( "&amp;" );
+			break;
+		case '<':
+			attributes.append( "&lt;" );
+			break;
+		case '>':
+			attributes.append( "&gt;" );
+			break;
+		case '\"':
+			attributes.append( "&quot;" );
+			break;
+		case '\'':
+			attributes.append( "&apos;" );
+			break;
+		default:
+			attributes.append( value );
+		}
+		attributes.append( '\"' );
 	}
 	
 	/**
 	 * Method addAttribute.
 	 * @param name String
 	 * @param value int
+	 * @throws IOException 
 	 */
-	public void addAttribute(String name, int value) {
+	public void addAttribute( String name, int value ) throws IOException{
 		if( isClosedStartNode )
 			throw new IllegalStateException();
-		attributes.append(' ').append(name).append("=\"").append(value).append('\"');
+		attributes.append( ' ' ).append( name ).append( "=\"" ).append( value ).append( '\"' );
 	}
 	
 	/**
 	 * Method addAttribute.
 	 * @param name String
 	 * @param value long
+	 * @throws IOException 
 	 */
-	public void addAttribute(String name, long value) {
+	public void addAttribute( String name, long value ) throws IOException{
 		if( isClosedStartNode )
 			throw new IllegalStateException();
-		attributes.append(' ').append(name).append("=\"").append(value).append('\"');
+		attributes.append( ' ' ).append( name ).append( "=\"" ).append( value ).append( '\"' );
 	}
 	
 	/**
 	 * Method addAttribute.
 	 * @param name String
 	 * @param value float
+	 * @throws IOException 
 	 */
-	public void addAttribute(String name, float value) {
+	public void addAttribute( String name, float value ) throws IOException{
 		if( isClosedStartNode )
 			throw new IllegalStateException();
-		attributes.append(' ').append(name).append("=\"").append(value).append('\"');
+		attributes.append( ' ' ).append( name ).append( "=\"" ).append( value ).append( '\"' );
 	}
 	
 	/**
 	 * Method addAttribute.
 	 * @param name String
 	 * @param value double
+	 * @throws IOException 
 	 */
-	public void addAttribute(String name, double value) {
+	public void addAttribute( String name, double value ) throws IOException{
 		if( isClosedStartNode )
 			throw new IllegalStateException();
-		attributes.append(' ').append(name).append("=\"").append(value).append('\"');
+		attributes.append( ' ' ).append( name ).append( "=\"" ).append( value ).append( '\"' );
 	}
 	
 	/**
@@ -339,17 +435,11 @@ public final class XMLWriter{
 	 * @param name String
 	 * @param value Object
 	 */
-	public void addAttribute(String name, Object value) {
-		if( isClosedStartNode )
-			throw new IllegalStateException();
-		attributes.append(' ').append(name).append("=\"").append(value).append('\"');
+	public void addAttribute( String name, Object value ) throws IOException{
+		addAttribute( name, value.toString() );
 	}
 	
-	/**
-	 * Method writeCDATA.
-	 * @param content String
-	 */
-	public void writeCDATA( String content ){
+	private void write( String content, StringDigester digester ) throws IOException{
 		hasContent = content != null && content.length() > 0;
 		if( hasContent ){
 			if( !isClosedStartNode ){
@@ -357,29 +447,36 @@ public final class XMLWriter{
 				out.append( '>' );
 				isClosedStartNode = true;
 			}
-			out.append( "<![CDATA[" ).append( content ).append( "]]>" );
-			nodeStack.peek().isSingleLineNode = true;
+			digester.digestString( content, out );
+			assert ( nodeStack.peek() != null ): "Escribiendo en nodo vacio: " + content;
+			if( nodeStack.peek() != null )
+				nodeStack.peek().isSingleLineNode = true;
 		}
+	}
+	
+	/**
+	 * Method writeCDATA.
+	 * @param content String
+	 */
+	public void writeCDATA( String content ) throws IOException{
+		write( content, StringDigester.CDATA );
+	}
+	
+	/**
+	 * @param content
+	 */
+	public void write( String content ) throws IOException{
+		write( content, StringDigester.XMLCharsFilter );
+	}
+	
+	/**
+	 * @param content
+	 */
+	public void insert( String content ) throws IOException{
+		write( content, StringDigester.Default );
 	}
 
-	/**
-	 * Method writeCDATA.
-	 * @param content String
-	 */
-	public void write( String content ){
-		hasContent = content != null && content.length() > 0;
-		if( hasContent ){
-			if( !isClosedStartNode ){
-				flushAttributes();
-				out.append( '>' );
-				isClosedStartNode = true;
-			}
-			out.append( content );
-			nodeStack.peek().isSingleLineNode = true;
-		}
-	}
-	
-	public void closeNode(){
+	public void closeNode() throws IOException{
 		tabs.remove();
 		Node previous = nodeStack.pop();
 	
@@ -395,7 +492,7 @@ public final class XMLWriter{
 		hasContent = true;
 	}
 	
-	public void emptyNode( String nodeName ){
+	public void emptyNode( String nodeName ) throws IOException{
 		openNode( nodeName );
 		closeNode();
 	}
