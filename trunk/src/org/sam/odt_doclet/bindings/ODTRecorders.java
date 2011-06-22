@@ -41,7 +41,7 @@ final class ODTRecorders extends Recorders{
 		if( content != null && content.length() > 0 ){
 			writer.openNode( "text:p" );
 				writer.addAttribute( "text:style-name", style );
-				writer.insert( FORMATER.format( content ) );
+				FORMATER.format( content, writer );
 			writer.closeNode();
 		}
 	}
@@ -103,7 +103,7 @@ final class ODTRecorders extends Recorders{
 			writer.closeNode();
 			if( t.documentation != null && t.documentation.length() > 0 ){
 				writer.emptyNode( "text:tab" );
-				writer.insert( FORMATER.format( t.documentation ) );
+				FORMATER.format( t.documentation, writer );
 			}
 		}
 	}
@@ -128,7 +128,7 @@ final class ODTRecorders extends Recorders{
 			writer.closeNode();
 			if( t.documentation != null && t.documentation.length() > 0 ){
 				writer.emptyNode( "text:tab" );
-				writer.insert( FORMATER.format( t.documentation ) );
+				FORMATER.format( t.documentation, writer );
 			}
 		}
 	}
@@ -150,7 +150,7 @@ final class ODTRecorders extends Recorders{
 				writer.closeNode();
 				if( t.documentation != null && t.documentation.length() > 0 ){
 					writer.emptyNode( "text:tab" );
-					writer.insert( FORMATER.format( t.documentation ) );
+					FORMATER.format( t.documentation, writer );
 				}
 			writer.closeNode();
 			writeParagraph( "Mire También:", t.links, writer, mapper );
@@ -187,7 +187,7 @@ final class ODTRecorders extends Recorders{
 				writer.closeNode();
 				if( t.documentation != null && t.documentation.length() > 0 ){
 					writer.emptyNode( "text:tab" );
-					writer.insert( FORMATER.format( t.documentation ) );
+					FORMATER.format( t.documentation, writer );
 				}
 			writer.closeNode();
 			writeParagraph( "Mire También:", t.links, writer, mapper );

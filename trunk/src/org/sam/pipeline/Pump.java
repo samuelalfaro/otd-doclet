@@ -26,13 +26,13 @@ import java.io.OutputStream;
 
 /**
  */
-public interface Pump {
-	
+public interface Pump{
+
 	/**
 	 * Method process.
 	 * @param out OutputStream
 	 * @throws IOException
 	 */
-	void process(OutputStream out) throws IOException;
-	
+	void process( OutputStream out ) throws IOException;
+
 }

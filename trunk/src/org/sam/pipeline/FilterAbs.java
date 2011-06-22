@@ -29,37 +29,38 @@ import java.io.PipedOutputStream;
 /**
  */
 public abstract class FilterAbs extends PipeConectorAbs implements Filter{
-	
+
 	/**
 	 * Constructor for FilterAbs.
 	 * @param pump Pump
 	 * @throws IOException
 	 */
-	public FilterAbs(Pump pump) throws IOException{
-		super(pump);
+	public FilterAbs( Pump pump ) throws IOException{
+		super( pump );
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.sam.pipeline.Pump#process(java.io.OutputStream)
 	 */
 	@Override
-	public final void process(OutputStream out) throws IOException{
-		if(pump == null)
-			throw new RuntimeException("Source is null");
-		
+	public final void process( OutputStream out ) throws IOException{
+		if( pump == null )
+			throw new RuntimeException( "Source is null" );
+
 		PipedOutputStream pipeOut = new PipedOutputStream();
-		pump.setOutput(pipeOut);
-		Thread sourceThread = new Thread(pump);
-		
+		pump.setOutput( pipeOut );
+		Thread sourceThread = new Thread( pump );
+
 		PipedInputStream pipeIn;
 		pipeIn = new PipedInputStream();
-		pipeIn.connect(pipeOut);
-		
+		pipeIn.connect( pipeOut );
+
 		sourceThread.start();
-		process(pipeIn, out);
-		try {
+		process( pipeIn, out );
+		try{
 			sourceThread.join();
-		} catch (InterruptedException e) {
+		}catch( InterruptedException e ){
 			e.printStackTrace();
 		}
 		out.flush();

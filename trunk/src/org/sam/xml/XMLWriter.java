@@ -23,7 +23,7 @@ package org.sam.xml;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -37,7 +37,7 @@ public final class XMLWriter{
 		if( Appendable.class.isAssignableFrom( out.getClass() )  )
 			return (Appendable)out;
 		try{
-			return new OutputStreamWriter( out, "UTF-8" );
+			return new PrintStream( out, true, "UTF-8" );
 		}catch( UnsupportedEncodingException ignorada ){
 			assert ( false ): ignorada.toString();
 			return null;

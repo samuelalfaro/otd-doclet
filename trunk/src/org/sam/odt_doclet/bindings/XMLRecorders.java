@@ -39,6 +39,15 @@ final class XMLRecorders extends Recorders{
 
 	static final HTMLFormater FORMATER = new Cleaner( HTMLSerializer.Default );
 	
+	static void writeDocumentation( String documentation, XMLWriter writer ) throws IOException{
+		if( documentation != null && documentation.length() > 0 ){
+			writer.openNode("Documentation");
+				FORMATER.format( documentation, writer );
+			writer.closeNode();
+		}
+	}
+	
+	
 	/**
 	 * Method writeNode.
 	 * @param nodeName String
@@ -132,7 +141,7 @@ final class XMLRecorders extends Recorders{
 			
 			writer.openNode(nodeName);
 				writeNode( "Type", t.type, writer );
-				writeNode( "Documentation", FORMATER.format( t.documentation ), writer );
+				writeDocumentation( t.documentation, writer );
 			writer.closeNode();
 		}
 	}
@@ -150,7 +159,7 @@ final class XMLRecorders extends Recorders{
 				if(t.name!=null)
 					writer.addAttribute("name", t.name);
 				writeNode( "Type", t.type, writer );
-				writeNode( "Documentation", FORMATER.format( t.documentation ), writer );
+				writeDocumentation( t.documentation, writer );
 			writer.closeNode();
 		}
 	}
@@ -179,7 +188,7 @@ final class XMLRecorders extends Recorders{
 		public void record(ConstantBinding t, XMLWriter writer, RecordersMapper mapper) throws IOException{
 			writer.openNode("Constant");
 				writer.addAttribute("name", t.name);
-				writeNode( "Documentation", FORMATER.format( t.documentation ), writer );
+				writeDocumentation( t.documentation, writer );
 				writeNode( "Links", t.links, writer, mapper );
 			writer.closeNode();
 		}
@@ -206,7 +215,7 @@ final class XMLRecorders extends Recorders{
 				if(Modifier.isFinal(t.modifiers))
 					writer.addAttribute("isFinal", true);
 				writeNode( "Type", t.type, writer );
-				writeNode( "Documentation", FORMATER.format( t.documentation ), writer );
+				writeDocumentation( t.documentation, writer );
 				writeNode( "Links", t.links, writer, mapper );
 			writer.closeNode();
 		}
@@ -224,7 +233,7 @@ final class XMLRecorders extends Recorders{
 			writer.openNode("Constructor");
 				writer.addAttribute("name", t.name);
 				writer.addAttribute("visibility", t.visibility.toChar());
-				writeNode( "Documentation", FORMATER.format( t.documentation ), writer );
+				writeDocumentation( t.documentation, writer );
 				writeNode( "TypeParameters", t.typeParams, writer, mapper );
 				writeNode( "Parameters", t.params, writer, mapper );
 				writeNode( "Exceptions", t.exceptions, writer, mapper );
@@ -257,7 +266,7 @@ final class XMLRecorders extends Recorders{
 					writer.addAttribute("isFinal", true);
 				if(Modifier.isSynchronized(t.modifiers))
 					writer.addAttribute("isSynchronized", true);
-				writeNode( "Documentation", FORMATER.format( t.documentation ), writer );
+				writeDocumentation( t.documentation, writer );
 				writeNode( "TypeParameters", t.typeParams, writer, mapper );
 				writeNode( "Parameters", t.params, writer, mapper );
 				if(t.returnType != null)
@@ -279,7 +288,7 @@ final class XMLRecorders extends Recorders{
 		public void record(ClassBinding.Interface t, XMLWriter writer, RecordersMapper mapper) throws IOException{
 			writer.openNode( "Interface" );
 				writer.addAttribute( "name", t.name );
-				writeNode( "Documentation", FORMATER.format( t.documentation ), writer );
+				writeDocumentation( t.documentation, writer );
 				writeNode( "TypeParameters", t.parameters, writer, mapper );
 				writeNode( "Links", t.links, writer, mapper );
 				
@@ -302,7 +311,7 @@ final class XMLRecorders extends Recorders{
 		public void record(ClassBinding.Enum t, XMLWriter writer, RecordersMapper mapper) throws IOException{
 			writer.openNode( "Enum" );
 				writer.addAttribute( "name", t.name );
-				writeNode( "Documentation", FORMATER.format( t.documentation ), writer );
+				writeDocumentation( t.documentation, writer );
 				writeNode( "Links", t.links, writer, mapper );
 				
 				writeNode( "EnclosingClasses", t.enclosingClasses, writer, mapper );
@@ -327,7 +336,7 @@ final class XMLRecorders extends Recorders{
 				writer.addAttribute( "name", t.name );
 				if(t.isAbstract)
 					writer.addAttribute( "isAbstract", t.isAbstract );
-				writeNode( "Documentation", FORMATER.format( t.documentation ), writer );
+				writeDocumentation( t.documentation, writer );
 				writeNode( "TypeParameters", t.parameters, writer, mapper );
 				writeNode( "Links", t.links, writer, mapper );
 				

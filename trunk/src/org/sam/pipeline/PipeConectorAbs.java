@@ -27,61 +27,62 @@ import java.io.OutputStream;
 /**
  */
 abstract class PipeConectorAbs implements PipeConnector{
-	
+
 	/**
 	 */
 	static class RunnablePump implements Runnable{
-		
+
 		private final Pump pump;
 		private OutputStream out;
-		
+
 		/**
 		 * Constructor for RunnablePump.
 		 * @param pump Pump
 		 */
-		RunnablePump(Pump pump){
+		RunnablePump( Pump pump ){
 			this.pump = pump;
 		}
-		
+
 		/**
 		 * Method run.
 		 * @see java.lang.Runnable#run()
 		 */
-		public void run() {
-			try {
-				pump.process(out);
+		public void run(){
+			try{
+				pump.process( out );
 				out.flush();
 				out.close();
-			} catch (IOException e) {
+			}catch( IOException e ){
 				e.printStackTrace();
 			}
 		}
-		
+
 		/**
 		 * Method setOutput.
 		 * @param out OutputStream
 		 */
-		public void setOutput(OutputStream out){
+		public void setOutput( OutputStream out ){
 			this.out = out;
 		}
 	}
-	
+
 	RunnablePump pump;
-	
+
 	/**
 	 * Constructor for PipeConectorAbs.
 	 * @param pump Pump
 	 * @throws IOException
 	 */
-	PipeConectorAbs(Pump pump) throws IOException {
-		setPump(pump);
+	PipeConectorAbs( Pump pump ) throws IOException{
+		setPump( pump );
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.sam.pipeline.PipeConnector#setPump(org.sam.pipeline.Pump)
 	 */
 	@Override
-	public final void setPump(Pump pump) throws IOException {
-		this.pump = new RunnablePump(pump);
+	public final void setPump( Pump pump ) throws IOException{
+		this.pump = new RunnablePump( pump );
 	}
 }
