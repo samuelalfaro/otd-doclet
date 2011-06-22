@@ -27,7 +27,6 @@ import java.util.Collection;
 
 import org.sam.html.Cleaner;
 import org.sam.html.HTMLFormater;
-import org.sam.html.HTMLSerializer;
 import org.sam.xml.Recorder;
 import org.sam.xml.RecordersMapper;
 import org.sam.xml.XMLConverter;
@@ -37,7 +36,7 @@ final class XMLRecorders extends Recorders{
 	
 	XMLRecorders(){}
 
-	static final HTMLFormater FORMATER = new Cleaner( HTMLSerializer.Default );
+	static final HTMLFormater FORMATER = new Cleaner();
 	
 	static void writeDocumentation( String documentation, XMLWriter writer ) throws IOException{
 		if( documentation != null && documentation.length() > 0 ){
@@ -46,7 +45,6 @@ final class XMLRecorders extends Recorders{
 			writer.closeNode();
 		}
 	}
-	
 	
 	/**
 	 * Method writeNode.

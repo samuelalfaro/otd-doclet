@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU General Public License
  * along with odf-doclet.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.sam.odt_doclet;
+package pruebas;
 
 import java.io.StringWriter;
 

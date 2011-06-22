@@ -26,9 +26,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.sam.odt_doclet.bindings.ClassBindingFactory;
-import org.sam.odt_doclet.pipeline.PipeLine;
-
-import pruebas.ClaseDePrueba;
 
 /**
  * 
@@ -45,9 +42,9 @@ public class PruebaToPNG {
 		
 		Class<?> clazz;
 		/*
-		ClassLoader loader = org.sam.odf_doclet.ClassLoaderTools.getLoader( 
-			"/media/DATA/Samuel/Proyectos/jspacewars/", 
-			"lib/ext/vecmath.jar:lib/gluegen-rt.jar:lib/jogl.jar:lib/FengGUI.jar:lib/xstream-1.3.jar:lib/ibxm-alpha51.jar:lib/jogg-0.0.7.jar:lib/jorbis-0.0.15.jar:bin");
+		ClassLoader loader = org.sam.odt_doclet.ClassLoaderTools.getLoader( 
+			"/media/DATA/Samuel/Proyectos/jspacewars/bin", 
+			"/media/DATA/Samuel/Proyectos/jspacewars/lib");
 		clazz = Class.forName( "org.sam.jogl.ObjLoader", false, loader );
 		for(Class<?> subClass: clazz.getDeclaredClasses()){
 			if(subClass.getCanonicalName().equals("org.sam.jogl.ObjLoader.Primitive")){
@@ -56,11 +53,11 @@ public class PruebaToPNG {
 			}
 		}
 		/*/
-		clazz = ClaseDePrueba.class;
+		clazz = pruebas.ClaseDePrueba.class;
 		//*/
-		
-		System.out.print("Generando gráfico de "+clazz.getSimpleName()+" ...");
-		//PipeLine.toXML( ClassBindingFactory.createBinding( clazz ), System.out );
+	
+		PipeLine.toXML( ClassBindingFactory.createBinding( clazz ), System.out );
+		System.out.print("\nGenerando gráfico de "+clazz.getSimpleName()+" ...");
 		PipeLine.toPNG( ClassBindingFactory.createBinding( clazz ), new FileOutputStream( "output/out.png" ) );
 		System.out.println("\tok");
 	}
