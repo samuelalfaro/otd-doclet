@@ -21,6 +21,13 @@
  */
 package org.sam.html;
 
+import java.io.IOException;
+
+import org.sam.xml.XMLWriter;
+
 public interface HTMLFormater{
+	
+	public void format( String html, XMLWriter writer ) throws IOException;
+	
 	public String format( String html );
 }

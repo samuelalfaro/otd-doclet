@@ -67,7 +67,7 @@ class ToXML implements Pump{
 		converter = new XMLConverter();
 		Recorders.register( Recorders.Mode.XML, converter );
 	}
-	
+
 	/**
 	 * Method setSource.
 	 * @param source ClassBinding
@@ -76,12 +76,13 @@ class ToXML implements Pump{
 		this.source = source;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.sam.pipeline.Pump#process(java.io.OutputStream)
 	 */
 	@Override
 	public void process( OutputStream out ) throws IOException{
-		converter.setWriter( new XMLWriter( out, false ) );
+		converter.setWriter( new XMLWriter( out ) );
 		converter.write( source );
 	}
 }
@@ -106,14 +107,15 @@ class ToSVG extends FilterAbs{
 		super( pump );
 
 		transformer = TransformerFactory.newInstance().newTransformer(
-					new StreamSource( 
-							Loader.getResourceAsStream("resources/shared/toSVG.xsl"),
-							Loader.getResourceAsURI("resources/shared/toSVG.xsl").toString() )
+				new StreamSource(
+						Loader.getResourceAsStream( "resources/shared/toSVG.xsl" ),
+						Loader.getResourceAsURI( "resources/shared/toSVG.xsl" ).toString()
+				)
 		);
 		transformer.setParameter( "widthChar1", 6.6 );
 		transformer.setParameter( "widthChar2", 9.0 );
 	}
-	
+
 	public void setScale( double scale ){
 		transformer.setParameter( "scale", scale );
 	}
@@ -129,8 +131,9 @@ class ToSVG extends FilterAbs{
 	public void setBackground( Color color ){
 		setBackground( color.getRed(), color.getGreen(), color.getBlue() );
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.sam.pipeline.Filter#process(java.io.InputStream, java.io.OutputStream)
 	 */
 	@Override
@@ -149,28 +152,26 @@ class ToSVG extends FilterAbs{
 final class PNGSizeGrabber extends OutputStream{
 
 	private final OutputStream out;
-	
+
 	private final byte[] widthBytes;
 	private final byte[] heightBytes;
-	
+
 	private int writtenBytes;
-	
+
 	PNGSizeGrabber( OutputStream out ){
 		this.out = out;
-		widthBytes  = new byte[4];
+		widthBytes = new byte[4];
 		heightBytes = new byte[4];
 		writtenBytes = 0;
 	}
 
-	private static int toInt(byte[] bytes){
-		return 
-			( ( bytes[0] << 24 ) & 0xFF000000 ) |
-			( ( bytes[1] << 16 ) & 0x00FF0000 ) |
-			( ( bytes[2] << 8  ) & 0x0000FF00 ) |
-			( ( bytes[3]       ) & 0x000000FF );
+	private static int toInt( byte[] bytes ){
+		return ( ( bytes[0] << 24 ) & 0xFF000000 ) | ( ( bytes[1] << 16 ) & 0x00FF0000 )
+				| ( ( bytes[2] << 8 ) & 0x0000FF00 ) | ( ( bytes[3] ) & 0x000000FF );
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see java.io.OutputStream#write(int)
 	 */
 	@Override
@@ -187,8 +188,9 @@ final class PNGSizeGrabber extends OutputStream{
 			writtenBytes++;
 		}
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see java.io.OutputStream#write(byte[], int, int)
 	 */
 	@Override
@@ -203,7 +205,8 @@ final class PNGSizeGrabber extends OutputStream{
 				else
 					heightBytes[writtenBytes - 20] = bytes[i + off];
 			}
-			writtenBytes++; i++;
+			writtenBytes++;
+			i++;
 		}
 	}
 
@@ -233,10 +236,11 @@ class ToPNG extends FilterAbs{
 		super( pump );
 		transcoder = new PNGTranscoder();
 		transcoder.addTranscodingHint( SVGAbstractTranscoder.KEY_EXECUTE_ONLOAD, Boolean.TRUE );
-		uri = new File( Loader.getRunPath() + "resources").toURI().toString();
+		uri = new File( Loader.getRunPath() + "resources" ).toURI().toString();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.sam.pipeline.Filter#process(java.io.InputStream, java.io.OutputStream)
 	 */
 	@Override
@@ -255,9 +259,9 @@ class ToPNG extends FilterAbs{
 /**
  */
 class ToIMG extends SinkAbs{
-	
+
 	private BufferedImage destination;
-	
+
 	/**
 	 * Constructor for ToIMG.
 	 * @param pump Pump
@@ -267,14 +271,15 @@ class ToIMG extends SinkAbs{
 		super( pump );
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.sam.pipeline.Sink#process(java.io.InputStream)
 	 */
 	@Override
 	public void process( InputStream in ) throws IOException, FilterException{
 		destination = ImageIO.read( in );
 	}
-	
+
 	/**
 	 * Method getDestination.
 	 * @return BufferedImage
@@ -286,26 +291,27 @@ class ToIMG extends SinkAbs{
 
 /**
  */
-public final class PipeLine {
-	
-	private static ToXML  toXML;
-	private static ToSVG  toSVG;
+public final class PipeLine{
+
+	private static ToXML toXML;
+	private static ToSVG toSVG;
 	private static Filter toPNG;
-	private static ToIMG  toIMG;
-	
+	private static ToIMG toIMG;
+
 	static{
 		try{
 			toXML = new ToXML();
-			toSVG = new ToSVG(toXML);
-			toPNG = new ToPNG(toSVG);
-			toIMG = new ToIMG(toPNG);
+			toSVG = new ToSVG( toXML );
+			toPNG = new ToPNG( toSVG );
+			toIMG = new ToIMG( toPNG );
 		}catch( Throwable e ){
 			e.printStackTrace();
 		}
 	}
-	
-	private PipeLine(){}
-	
+
+	private PipeLine(){
+	}
+
 	/**
 	 * @param clazz
 	 * @param out
@@ -315,7 +321,7 @@ public final class PipeLine {
 		toXML.setSource( clazz );
 		toXML.process( out );
 	}
-	
+
 	/**
 	 * @param clazz
 	 * @param scale
@@ -327,7 +333,7 @@ public final class PipeLine {
 		toSVG.setScale( scale );
 		toSVG.process( out );
 	}
-	
+
 	/**
 	 * @param clazz
 	 * @param out
@@ -336,7 +342,7 @@ public final class PipeLine {
 	public static void toSVG( ClassBinding clazz, OutputStream out ) throws IOException{
 		toSVG( clazz, 1.0, out );
 	}
-	
+
 	/**
 	 * @param clazz
 	 * @param scale
@@ -351,7 +357,7 @@ public final class PipeLine {
 		toPNG.process( grabber );
 		return new Dimension( grabber.getWidth(), grabber.getHeight() );
 	}
-	
+
 	/**
 	 * @param clazz
 	 * @param out
@@ -359,9 +365,9 @@ public final class PipeLine {
 	 * @throws IOException
 	 */
 	public static Dimension toPNG( ClassBinding clazz, OutputStream out ) throws IOException{
-		return toPNG( clazz, 1.0, out  );
+		return toPNG( clazz, 1.0, out );
 	}
-	
+
 	/**
 	 * @param clazz
 	 * @return BufferedImage

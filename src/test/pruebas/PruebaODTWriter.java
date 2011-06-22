@@ -37,7 +37,7 @@ public class PruebaODTWriter{
 		XMLConverter converter = new XMLConverter();
 		converter.setWriter( new XMLWriter( (Appendable)System.out, 4 ) );
 		
-		Recorders.register( Recorders.Mode.ODT, converter );
+		Recorders.register( Recorders.Mode.XML, converter );
 		
 		converter.write( ClassBindingFactory.createBinding( clazz ) );
 

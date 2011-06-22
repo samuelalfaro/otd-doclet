@@ -60,7 +60,7 @@ public class PruebaToPNG {
 		//*/
 		
 		System.out.print("Generando gráfico de "+clazz.getSimpleName()+" ...");
-		PipeLine.toXML( ClassBindingFactory.createBinding( clazz ), System.out );
+		//PipeLine.toXML( ClassBindingFactory.createBinding( clazz ), System.out );
 		PipeLine.toPNG( ClassBindingFactory.createBinding( clazz ), new FileOutputStream( "output/out.png" ) );
 		System.out.println("\tok");
 	}

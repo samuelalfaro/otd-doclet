@@ -43,27 +43,28 @@ public final class Cleaner implements HTMLFormater {
 		this.cleaner = new HtmlCleaner(props);
 		this.serializer = serializer;
 	}
-
-	private String toString( TagNode node ) throws IOException{
-		StringBuffer buff = new StringBuffer();
+	
+	private void format( TagNode node, XMLWriter writer ) throws IOException{
 		for( Object item: node.getChildren() ){
 			if( item instanceof TagNode ){
 				if( ((TagNode)item).getName().equals( "body" ) )
-					serializer.serialize( (TagNode)item, new XMLWriter( buff ) );
+					serializer.serialize( (TagNode)item, writer );
 			}
 		}
-		return buff.toString();
 	}
 	
-	public String format( String s ){
-		String result = "";
-		if( s != null && s.length() > 0 )
-			try{
-				result = toString( cleaner.clean( s ) );
-			}catch( IOException e ){
-				e.printStackTrace();
-			}
-		return result;
+	public void format( String html, XMLWriter writer ) throws IOException{
+		format( cleaner.clean( html ), writer );
+	}
+	
+	public String format( String html ){
+		StringBuffer buff = new StringBuffer();
+		try{
+			format( cleaner.clean( html ), new XMLWriter( buff ) );
+		}catch( IOException e ){
+			return null;
+		}
+		return buff.toString();
 	}
 	
 }
