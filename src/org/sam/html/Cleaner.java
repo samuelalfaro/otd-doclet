@@ -33,6 +33,10 @@ public final class Cleaner implements HTMLFormater {
 	private final HtmlCleaner cleaner;
 	private final HTMLSerializer serializer;
 	
+	public Cleaner(){
+		this( HTMLSerializer.Default  );
+	}
+	
 	public Cleaner( HTMLSerializer serializer ){
 		CleanerProperties  props = new CleanerProperties();
 		// set some properties to non-default values

@@ -29,6 +29,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import javax.xml.transform.stream.StreamSource;
+
 /**
  * 
  */
@@ -94,6 +96,28 @@ public class Loader{
 		if( file.exists() && file.canRead() )
 			return file.toURI();
 		
+		return null;
+	}
+	
+	public static StreamSource getResourceAsStreamSource( String name ){
+		URL url = getClassLoader().getResource( name );
+		try{
+			if( url != null )
+				try{
+					return new StreamSource( url.openStream(), url.toURI().toString() );
+				}catch( URISyntaxException ignorada ){
+				}
+
+			File file = new File( name );
+			if( file.exists() && file.canRead() )
+				return new StreamSource( new FileInputStream( file ), file.toURI().toString() );
+
+			file = new File( getRunPath() + name );
+			if( file.exists() && file.canRead() )
+				return new StreamSource( new FileInputStream( file ), file.toURI().toString() );
+		}catch( IOException e ){
+			e.printStackTrace();
+		}
 		return null;
 	}
 }

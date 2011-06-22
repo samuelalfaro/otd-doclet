@@ -107,10 +107,7 @@ class ToSVG extends FilterAbs{
 		super( pump );
 
 		transformer = TransformerFactory.newInstance().newTransformer(
-				new StreamSource(
-						Loader.getResourceAsStream( "resources/shared/toSVG.xsl" ),
-						Loader.getResourceAsURI( "resources/shared/toSVG.xsl" ).toString()
-				)
+				Loader.getResourceAsStreamSource( "resources/shared/toSVG.xsl" )
 		);
 		transformer.setParameter( "widthChar1", 6.6 );
 		transformer.setParameter( "widthChar2", 9.0 );
