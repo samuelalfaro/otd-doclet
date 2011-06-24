@@ -99,10 +99,32 @@ final class ODTRecorders extends Recorders{
 						 * evitando anidar párrafos, dentro del párrafo del comentario. Aunque no
 						 * chequea que pueda haber más párrafos anidados dentro del propio comentario.
 						 */
-						//buff.append( "</text:p><text:p text:style-name=\"Standard\">" );
+						writer.insert( "</text:p><text:p text:style-name=\"Standard\">" );
 						serialize( tagNode, writer );
 					}else if( nodeName.equalsIgnoreCase( "img" ) ){
-
+						String src = tagNode.getAttributeByName( "src" );
+						if( src != null && src.length() > 0 ){
+							writer.openNode( "draw:frame" );
+								writer.addAttribute( "draw:style-name", "G0" );
+								String alt = tagNode.getAttributeByName( "alt" );
+								if( alt != null && alt.length() > 0 )
+									writer.addAttribute( "draw:name", alt );
+								writer.addAttribute( "text:anchor-type", "as-char" );
+								// FIXME evaluar px, % o null, obtener dimensiones cargando src.
+								// pixels en puntos --> 72 dpi
+								String width = tagNode.getAttributeByName( "width" );
+								writer.addAttribute( "svg:width", width+"pt" );
+								String height = tagNode.getAttributeByName( "height" );
+								writer.addAttribute( "svg:height", height+"pt" );
+								writer.addAttribute( "draw:z-index", "0" );
+								writer.openNode( "draw:image" );
+									writer.addAttribute( "xlink:href", src );
+									writer.addAttribute( "xlink:type", "simple" );
+									writer.addAttribute( "xlink:show", "embed" );
+									writer.addAttribute( "xlink:actuate", "onLoad" );
+								writer.closeNode();
+							writer.closeNode();
+						}
 					}else if( nodeName.equalsIgnoreCase( "ol" ) ){
 
 					}else if( nodeName.equalsIgnoreCase( "ul" ) ){
