@@ -116,6 +116,7 @@ final class ODTRecorders extends Recorders{
 								writer.addAttribute( "svg:width", width+"pt" );
 								String height = tagNode.getAttributeByName( "height" );
 								writer.addAttribute( "svg:height", height+"pt" );
+								
 								writer.addAttribute( "draw:z-index", "0" );
 								writer.openNode( "draw:image" );
 									writer.addAttribute( "xlink:href", src );
@@ -213,7 +214,7 @@ final class ODTRecorders extends Recorders{
 			writer.emptyNode( "text:line-break" );
 			writer.openNode( "text:span" );
 				writer.addAttribute( "text:style-name", "TBold" );
-				writer.write( t.type + ":");
+				writer.write( t.type + " :");
 			writer.closeNode();
 			if( t.documentation != null && t.documentation.length() > 0 ){
 				writer.emptyNode( "text:tab" );

@@ -34,17 +34,17 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
-import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Queue;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
 import org.sam.odt_doclet.bindings.ClassBinding;
 import org.sam.odt_doclet.bindings.ClassBindingFactory;
+import org.sam.odt_doclet.bindings.Recorders;
 import org.sam.odt_doclet.pipeline.PipeLine;
+import org.sam.xml.XMLConverter;
 import org.sam.xml.XMLWriter;
 
 import com.sun.javadoc.ClassDoc;
@@ -126,6 +126,7 @@ public final class ODTDoclet{
 		}
 	}
 
+	/*
 	private static class ContentGenerator{
 
 		private static String readTemplate( InputStream in ) throws IOException{
@@ -160,94 +161,18 @@ public final class ODTDoclet{
 			return writer.getBuffer().toString().getBytes( UTF8 );
 		}
 	}
+	*/
 	
-	private void insertImage(XMLWriter writer) throws IOException{
-		writer.openNode( "draw:frame" );
-			writer.addAttribute( "draw:style-name", "G0" );
-			writer.addAttribute( "draw:name", "$graphic.name" );
-			writer.addAttribute( "text:anchor-type", "as-char" );
-			writer.addAttribute( "svg:width", "${graphic.width}mm" );
-			writer.addAttribute( "svg:height", "${graphic.height}mm" );
-			writer.addAttribute( "draw:z-index", "0" );
-			writer.openNode( "draw:image" );
-				writer.addAttribute( "xlink:href", "$graphic.path" );
-				writer.addAttribute( "xlink:type", "simple" );
-				writer.addAttribute( "xlink:show", "embed" );
-				writer.addAttribute( "xlink:actuate", "onLoad" );
-			writer.closeNode();
-		writer.closeNode();
+	private static class Par <U, V>{
+		
+		final U u;
+		final V v;
+		
+		Par(U u, V v){
+			this.u = u;
+			this.v = v;
+		}
 	}
-
-	private void beginDocumenContent( XMLWriter writer ) throws IOException{
-		
-		writer.openNode( "office:document-content ");
-		writer.addAttribute( "xmlns:office", "urn:oasis:names:tc:opendocument:xmlns:office:1.0" );
-		writer.addAttribute( "xmlns:style", "urn:oasis:names:tc:opendocument:xmlns:style:1.0" );
-		writer.addAttribute( "xmlns:text", "urn:oasis:names:tc:opendocument:xmlns:text:1.0" );
-		writer.addAttribute( "xmlns:table", "urn:oasis:names:tc:opendocument:xmlns:table:1.0" );
-		writer.addAttribute( "xmlns:draw", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" );
-		writer.addAttribute( "xmlns:fo", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" );
-		writer.addAttribute( "xmlns:xlink", "http://www.w3.org/1999/xlink" );
-		writer.addAttribute( "xmlns:dc", "http://purl.org/dc/elements/1.1/" );
-		writer.addAttribute( "xmlns:meta", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0" );
-		writer.addAttribute( "xmlns:number", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" );
-		writer.addAttribute( "xmlns:svg", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" );
-		writer.addAttribute( "xmlns:chart", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0" );
-		writer.addAttribute( "xmlns:dr3d", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" );
-		writer.addAttribute( "xmlns:math", "http://www.w3.org/1998/Math/MathML" );
-		writer.addAttribute( "xmlns:form", "urn:oasis:names:tc:opendocument:xmlns:form:1.0" );
-		writer.addAttribute( "xmlns:script", "urn:oasis:names:tc:opendocument:xmlns:script:1.0" );
-		writer.addAttribute( "xmlns:ooo", "http://openoffice.org/2004/office" );
-		writer.addAttribute( "xmlns:ooow", "http://openoffice.org/2004/writer" );
-		writer.addAttribute( "xmlns:oooc", "http://openoffice.org/2004/calc" );
-		writer.addAttribute( "xmlns:dom", "http://www.w3.org/2001/xml-events" );
-		writer.addAttribute( "xmlns:xforms", "http://www.w3.org/2002/xforms" );
-		writer.addAttribute( "xmlns:xsd", "http://www.w3.org/2001/XMLSchema" );
-		writer.addAttribute( "xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance" );
-		writer.addAttribute( "xmlns:rpt", "http://openoffice.org/2005/report" );
-		writer.addAttribute( "xmlns:of", "urn:oasis:names:tc:opendocument:xmlns:of:1.2" );
-		writer.addAttribute( "xmlns:xhtml", "http://www.w3.org/1999/xhtml" );
-		writer.addAttribute( "xmlns:grddl", "http://www.w3.org/2003/g/data-view#" );
-		writer.addAttribute( "xmlns:officeooo", "http://openoffice.org/2009/office" );
-		writer.addAttribute( "xmlns:tableooo", "http://openoffice.org/2009/table" );
-		writer.addAttribute( "xmlns:field", "urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" );
-		writer.addAttribute( "xmlns:formx", "urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" );
-		writer.addAttribute( "xmlns:css3t", "http://www.w3.org/TR/css3-text/" );
-		writer.addAttribute( "office:version", "1.2" );
-		writer.addAttribute( "grddl:transformation", "http://docs.oasis-open.org/office/1.2/xslt/odf2rdf.xsl" );
-		
-		writer.openNode( "office:font-face-decls");
-			writer.openNode( "style:font-face" );
-				writer.addAttribute( "style:name", "Liberation Serif" );
-				writer.addAttribute( "svg:font-family", "\'Liberation Serif\'" );
-				writer.addAttribute( "style:font-family-generic", "roman" );
-				writer.addAttribute( "style:font-pitch", "variable" );
-			writer.closeNode();
-			writer.openNode( "style:font-face" );
-				writer.addAttribute( "style:name", "Nimbus Mono L" );
-				writer.addAttribute( "svg:font-family", "\'Nimbus Mono L\'" );
-				writer.addAttribute( "style:font-family-generic", "modern" );
-				writer.addAttribute( "style:font-pitch", "fixed" );
-			writer.closeNode();
-		writer.closeNode();
-		
-		writer.openNode( "office:automatic-styles" );
-			writer.openNode( "style:style" );
-				writer.addAttribute( "style:name", "P0" );
-				writer.addAttribute( "style:family", "paragraph" );
-				writer.addAttribute( "style:parent-style-name", "Standard" );
-			writer.closeNode();
-			writer.openNode( "style:style" );
-				writer.addAttribute( "style:name", "P1" );
-				writer.addAttribute( "style:family", "paragraph" );
-				writer.addAttribute( "style:parent-style-name", "Standard" );
-				writer.openNode( "style:paragraph-properties" );
-					writer.addAttribute( "fo:break-before", "page" );
-				writer.closeNode();
-			writer.closeNode();
-		writer.closeNode();
-	}
-	
 	
 	/**
 	 * @param plantilla
@@ -280,31 +205,46 @@ public final class ODTDoclet{
 		}
 		zin.close();
 
-		ContentGenerator content = new ContentGenerator();
+		//ContentGenerator content = new ContentGenerator();
 
 		// FIXME 
 		/* Almacenar el classBinding junto a las dimensiones de la imagen generada
 		 * Usar el writer, para insertar la imagen, y el título.
 		 */
-		ClassDoc[] classes = root.classes();
-		for( ClassDoc classDoc: classes ){
-			String pictName = classDoc.qualifiedName();
-			String pictPath = "Pictures/" + pictName + ".png";
-			manifest.addImage( pictPath );
-
-			out.putNextEntry( new ZipEntry( pictPath ) );
+		Queue<Par<ClassBinding, Graphic>> classes = new LinkedList<Par<ClassBinding, Graphic>>();
+		for( ClassDoc classDoc: root.classes() )
 			try{
 				ClassBinding clazz = ClassBindingFactory.createBinding( classDoc );
-				content.addGraphic( pictName, pictPath, PipeLine.toPNG( clazz, scaleFactor, out ), dpi );
+				
+				String pictName = classDoc.qualifiedName();
+				String pictPath = "Pictures/" + pictName + ".png";
+				
+				out.putNextEntry( new ZipEntry( pictPath ) );
+					manifest.addImage( pictPath );
+					Dimension dim = PipeLine.toPNG( clazz, scaleFactor, out );
+				out.closeEntry();
+				classes.offer( new Par<ClassBinding, Graphic>( clazz, new Graphic( pictName, pictPath, dim, dpi ) ) );
 			}catch( ClassNotFoundException e ){
 				e.printStackTrace();
 			}
-			out.closeEntry();
-		}
-
+			
 		out.putNextEntry( new ZipEntry( "content.xml" ) );
 		manifest.addEntry( "text/xml", "content.xml" );
-		out.write( content.getBytes() );
+		
+		XMLWriter writer = new XMLWriter( out );
+		XMLConverter converter = new XMLConverter();
+		Recorders.register( Recorders.Mode.ODT, converter );
+		converter.setWriter( writer );
+		
+		ODTHelper.beginDocumenContent( writer );
+		for( Par<ClassBinding, Graphic> clazz: classes ){
+			writer.openNode( "text:p" );
+				writer.addAttribute( "text:style-name", "Estilo" );	
+				ODTHelper.insertImage( writer, "", clazz.v );
+			writer.closeNode();
+			converter.write( clazz.u );
+		}
+		ODTHelper.endDocumenContent( writer );
 
 		out.putNextEntry( new ZipEntry( "META-INF/manifest.xml" ) );
 		out.write( manifest.getBytes() );
