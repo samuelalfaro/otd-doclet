@@ -34,7 +34,6 @@ class Float{
 
 /**
  * Documentacion de la clase ClaseDePrueba.
-
  */
 public class ClaseDePrueba<E> {
 	
@@ -182,7 +181,7 @@ public class ClaseDePrueba<E> {
 	/**
 	 * Documentación del constructor {@link java.lang.Math#sqrt(double) Math.sqrt}.
 	 * Con varias líneas de 
-	 * comentarios. Bla bla bla {@value 4} bla {@linkplain www.wikipedia.es} bla {@code a, b, c}.
+	 * comentarios. Bla bla bla {@value DiasDeLaSemana#Monday} bla {@linkplain http://es.wikipedia.org/} bla {@code a, b, c}.
 	 * @param parametro1 primer {@code a, b, c} argumento.<br/>
 	 * sigue el comentario en otra lista {@linkplain #metodo2(pruebas.ClaseDePrueba.InerClassAbs.InerInerClass)}.
 	 * @param parametro2 segundo argumento.

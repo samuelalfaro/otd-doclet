@@ -31,6 +31,169 @@ import org.sam.xml.XMLWriter;
  */
 public class ODTHelper{
 	
+	public static class TextStyleProperties{
+		
+		private static final byte IS_SUP_MASK       = 0x20;
+		private static final byte IS_SUB_MASK       = 0x10;
+		private static final byte IS_MONO_MASK      = 0x08;
+		private static final byte IS_BOLD_MASK      = 0x04;
+		private static final byte IS_ITALIC_MASK    = 0x02;
+		private static final byte IS_UNDERLINE_MASK = 0x01;
+		
+		private byte properties;
+		
+		public TextStyleProperties(){
+			this.properties = 0x00;
+		}
+		
+		public void setSup( boolean isSup ){
+			if( isSup ){
+				properties &= ~IS_SUB_MASK;
+				properties |= IS_SUP_MASK;
+			}else
+				properties &= ~IS_SUP_MASK;
+		}
+
+		public boolean isSup(){
+			return ( properties & IS_SUP_MASK ) != 0;
+		}
+
+		public void setSub( boolean isSub ){
+			if( isSub ){
+				properties &= ~IS_SUP_MASK;
+				properties |= IS_SUB_MASK;
+			}else
+				properties &= ~IS_SUB_MASK;
+		}
+
+		public boolean isSub(){
+			return ( properties & IS_SUB_MASK ) != 0;
+		}
+
+		public void setMono( boolean isMono ){
+			if( isMono )
+				properties |= IS_MONO_MASK;
+			else
+				properties &= ~IS_MONO_MASK;
+		}
+
+		public boolean isMono(){
+			return ( properties & IS_MONO_MASK ) != 0;
+		}
+
+		public void setBold( boolean isBold ){
+			if( isBold )
+				properties |= IS_BOLD_MASK;
+			else
+				properties &= ~IS_BOLD_MASK;
+		}
+
+		public boolean isBold(){
+			return ( properties & IS_BOLD_MASK ) != 0;
+		}
+
+		public void setItalic( boolean isItalic ){
+			if( isItalic )
+				properties |= IS_ITALIC_MASK;
+			else
+				properties &= ~IS_ITALIC_MASK;
+		}
+
+		public boolean isItalic(){
+			return ( properties & IS_ITALIC_MASK ) != 0;
+		}
+
+		public void setUnderline( boolean isUnderline ){
+			if( isUnderline )
+				properties |= IS_UNDERLINE_MASK;
+			else
+				properties &= ~IS_UNDERLINE_MASK;
+		}
+
+		public boolean isUnderline(){
+			return ( properties & IS_UNDERLINE_MASK ) != 0;
+		}
+		
+		public String toString(){
+			StringBuilder builder = new StringBuilder("AutoStyle");
+			if( isSup() )
+				builder.append( "Sp" );
+			else if( isSub() )
+				builder.append( "Sb" );
+			if( isMono() )
+				builder.append( "M" );
+			if( isBold() )
+				builder.append( "B" );
+			if( isItalic() )
+				builder.append( "I" );
+			if( isUnderline() )
+				builder.append( "U" );
+			return builder.toString();
+		}
+	}
+	
+	private static void generateAutoStyle( XMLWriter writer, TextStyleProperties properties ) throws IOException{
+		writer.openNode( "style:style" );
+			writer.addAttribute( "style:name", properties.toString() );
+			writer.addAttribute( "style:family", "text" );
+			writer.openNode( "style:text-properties" );
+				if( properties.isSup() )
+					writer.addAttribute( "style:text-position", "super 58%" );
+				else if( properties.isSup() )
+					writer.addAttribute( "style:text-position", "sub 58%" );
+				if( properties.isMono() ){
+					writer.addAttribute( "style:font-name", "Nimbus Mono L" );
+				}
+				if( properties.isBold() ){
+					writer.addAttribute( "fo:font-weight", "bold" );
+					writer.addAttribute( "style:font-weight-asian", "bold" );
+					writer.addAttribute( "style:font-weight-complex", "bold" );
+				}else{
+					writer.addAttribute( "fo:font-weight", "normal" );
+					writer.addAttribute( "style:font-weight-asian", "normal" );
+					writer.addAttribute( "style:font-weight-complex", "normal" );
+				}
+				if( properties.isItalic() ){
+					writer.addAttribute( "fo:font-style", "italic" );
+					writer.addAttribute( "style:font-style-asian", "italic" );
+					writer.addAttribute( "style:font-style-complex", "italic" );
+				}else{
+					writer.addAttribute( "fo:font-style", "normal" );
+					writer.addAttribute( "style:font-style-asian", "normal" );
+					writer.addAttribute( "style:font-style-complex", "normal" );
+				}
+				if( properties.isUnderline() ){
+					writer.addAttribute( "style:text-underline-style", "solid" );
+					writer.addAttribute( "style:text-underline-width", "auto" );
+					writer.addAttribute( "style:text-underline-color", "font-color" );
+				}else{
+					writer.addAttribute( "style:text-underline-style", "none" );
+				}
+			writer.closeNode();
+		writer.closeNode();
+	}
+	
+	private static void generateAutoStyles( XMLWriter writer ) throws IOException{
+		TextStyleProperties properties = new TextStyleProperties();
+		for( int i = 0; i < 3; i++ ){
+			properties.setSup( i == 1 );
+			properties.setSub( i == 2 );
+			for( int j = 0; j < 2; j++ ){
+				properties.setMono( j == 1 );
+				for( int k = 0; k < 2; k++ ){
+					properties.setBold( k == 1 );
+					for( int l = 0; l < 2; l++ ){
+						properties.setItalic( l == 1 );
+						for( int m = 0; m < 2; m++ ){
+							properties.setUnderline( m == 1 );
+							generateAutoStyle( writer, properties );
+						}
+					}
+				}
+			}
+		}
+	}
+	
 	public static void beginDocumenContent( XMLWriter writer ) throws IOException{
 		writer.insert( "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" );
 		writer.openNode( "office:document-content ");
@@ -98,8 +261,10 @@ public class ODTHelper{
 						writer.addAttribute( "fo:break-before", "page" );
 					writer.closeNode();
 				writer.closeNode();
+				
+				generateAutoStyles( writer );
+				
 			writer.closeNode();
-			
 			
 			writer.openNode( "office:body" );
 				writer.openNode( "office:text" );

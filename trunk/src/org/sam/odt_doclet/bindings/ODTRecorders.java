@@ -39,6 +39,7 @@ final class ODTRecorders extends Recorders{
 	ODTRecorders(){}
 	
 	static final HTMLFormater FORMATER = new Cleaner( new HTMLSerializer(){
+		
 		public void serialize( TagNode node, XMLWriter writer ) throws IOException{
 			for( Object item: node.getChildren() ){
 				if( item instanceof ContentNode ){
@@ -134,14 +135,14 @@ final class ODTRecorders extends Recorders{
 
 					}else{
 						writer.openNode( "text:span" );
-							writer.addAttribute( "text:style-name", "TBold" );
+							writer.addAttribute( "text:style-name", "AutoStyleB" );
 							writer.write( "¡¡¡ Etiqueta " );
 							writer.write( nodeName );
 							writer.write( " no soportada !!!" );
 						writer.closeNode();
 						serialize( tagNode, writer );
 						writer.openNode( "text:span" );
-							writer.addAttribute( "text:style-name", "TBold" );
+							writer.addAttribute( "text:style-name", "AutoStyleB" );
 							writer.write( "¡¡¡ Fin " );
 							writer.write( nodeName );
 							writer.write( " !!!" );
@@ -150,6 +151,7 @@ final class ODTRecorders extends Recorders{
 				}
 			}
 		}
+		
 	} );
 	
 	static void insertParagraph( String style, String content, XMLWriter writer ) throws IOException{
@@ -213,7 +215,7 @@ final class ODTRecorders extends Recorders{
 		public void record( DocumentedType t, XMLWriter writer, RecordersMapper mapper ) throws IOException{
 			writer.emptyNode( "text:line-break" );
 			writer.openNode( "text:span" );
-				writer.addAttribute( "text:style-name", "TBold" );
+				writer.addAttribute( "text:style-name", "AutoStyleB" );
 				writer.write( t.type + " :");
 			writer.closeNode();
 			if( t.documentation != null && t.documentation.length() > 0 ){
@@ -234,7 +236,7 @@ final class ODTRecorders extends Recorders{
 		public void record( ParameterBinding t, XMLWriter writer, RecordersMapper mapper ) throws IOException{
 			writer.emptyNode( "text:line-break" );
 			writer.openNode( "text:span" );
-				writer.addAttribute( "text:style-name", "TBold" );
+				writer.addAttribute( "text:style-name", "AutoStyleB" );
 				if( t.name != null ){
 					writer.write( t.name );
 					writer.write( ": " );
@@ -260,7 +262,7 @@ final class ODTRecorders extends Recorders{
 			writer.openNode( "text:p" );
 				writer.addAttribute( "text:style-name", "Estilo" );
 				writer.openNode( "text:span" );
-					writer.addAttribute( "text:style-name", "TBold" );
+					writer.addAttribute( "text:style-name", "AutoStyleB" );
 					writer.write( t.name );
 				writer.closeNode();
 				if( t.documentation != null && t.documentation.length() > 0 ){
@@ -295,7 +297,7 @@ final class ODTRecorders extends Recorders{
 			writer.openNode( "text:p" );
 				writer.addAttribute( "text:style-name", "Estilo" );
 				writer.openNode( "text:span" );
-					writer.addAttribute( "text:style-name", "TBold" );
+					writer.addAttribute( "text:style-name", "AutoStyleB" );
 					writer.write( t.name );
 					writer.write( ": " );
 					writer.write( t.type );
