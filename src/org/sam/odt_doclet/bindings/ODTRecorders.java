@@ -29,6 +29,7 @@ import org.htmlcleaner.TagNode;
 import org.sam.html.Cleaner;
 import org.sam.html.HTMLFormater;
 import org.sam.html.HTMLSerializer;
+import org.sam.odt_doclet.ODTHelper.TextStyleProperties;
 import org.sam.xml.Recorder;
 import org.sam.xml.RecordersMapper;
 import org.sam.xml.XMLConverter;
@@ -38,53 +39,76 @@ final class ODTRecorders extends Recorders{
 	
 	ODTRecorders(){}
 	
+	static boolean isTextSpan( String nodeName ){
+		return 
+			nodeName.equalsIgnoreCase( "code" ) ||
+			nodeName.equalsIgnoreCase( "sup" ) ||
+			nodeName.equalsIgnoreCase( "sub" ) ||
+			nodeName.equalsIgnoreCase( "tt" ) ||
+			nodeName.equalsIgnoreCase( "b" ) ||
+			nodeName.equalsIgnoreCase( "strong" ) ||
+			nodeName.equalsIgnoreCase( "i" ) ||
+			nodeName.equalsIgnoreCase( "em" ) ||
+			nodeName.equalsIgnoreCase( "u" );
+	}
+	
 	static final HTMLFormater FORMATER = new Cleaner( new HTMLSerializer(){
 		
+		TextStyleProperties properties = new TextStyleProperties();
+		
 		public void serialize( TagNode node, XMLWriter writer ) throws IOException{
+			
 			for( Object item: node.getChildren() ){
 				if( item instanceof ContentNode ){
-					writer.write( item.toString() );
+					boolean parrafoAuto = !writer.hasParent( "text:p" );
+					if( parrafoAuto )
+						writer.openNode( "text:p" );
+						writer.write( item.toString() );
+					if( parrafoAuto )
+						writer.closeUntilParent( "text:p" );
 				}else if( item instanceof TagNode ){
 					TagNode tagNode = (TagNode)item;
 					String nodeName = tagNode.getName();
-
+					
 					if( nodeName.equalsIgnoreCase( "br" ) ){
 						writer.emptyNode( "text:line-break" );
-					}else if( nodeName.equalsIgnoreCase( "b" ) || nodeName.equalsIgnoreCase( "strong" ) ){
-						writer.openNode( "text:span" );
-							writer.addAttribute( "text:style-name", "TBold" );
+					}else if( isTextSpan( nodeName ) ){
+						byte oldProperties = properties.getProperties();
+						if( nodeName.equalsIgnoreCase( "code" ) ){
+							properties.setMono( true );
+							properties.setItalic( true );
+						}else if( nodeName.equalsIgnoreCase( "sup" ) )
+							properties.setSup( true );
+						else if( nodeName.equalsIgnoreCase( "sub" ) )
+							properties.setSub( true );
+						else if( nodeName.equalsIgnoreCase( "tt" ) )
+							properties.setMono( true );
+						else if( nodeName.equalsIgnoreCase( "b" ) || nodeName.equalsIgnoreCase( "strong" ) )
+							properties.setBold( true );
+						else if( nodeName.equalsIgnoreCase( "i" ) || nodeName.equalsIgnoreCase( "em" ) )
+							properties.setItalic( true );
+						else if( nodeName.equalsIgnoreCase( "u" ) )
+							properties.setUnderline( true );
+						
+						boolean parrafoAuto = !writer.hasParent( "text:p" );
+						if( parrafoAuto )
+							writer.openNode( "text:p" );
+						if( writer.hasParent( "text:span" ) ){
+							if( writer.nodeName().equalsIgnoreCase( "text:span" ) && !writer.hasContent() )
+								writer.discardAttributes();
+							else{
+								writer.closeUntilParent( "text:span" );
+							}
+						}
+						if( !writer.nodeName().equalsIgnoreCase( "text:span" ) ){
+							writer.openNode( "text:span" );	
+						}
+							writer.addAttribute( "text:style-name", properties.toString() );
 							serialize( tagNode, writer );
-						writer.closeNode();
-					}else if( nodeName.equalsIgnoreCase( "i" ) || nodeName.equalsIgnoreCase( "em" ) ){
-						writer.openNode( "text:span" );
-							writer.addAttribute( "text:style-name", "TItalic" );
-							serialize( tagNode, writer );
-						writer.closeNode();
-					}else if( nodeName.equalsIgnoreCase( "u" ) ){
-						writer.openNode( "text:span" );
-							writer.addAttribute( "text:style-name", "TUnderline" );
-							serialize( tagNode, writer );
-						writer.closeNode();
-					}else if( nodeName.equalsIgnoreCase( "tt" ) ){
-						writer.openNode( "text:span" );
-							writer.addAttribute( "text:style-name", "TMonospaced" );
-							serialize( tagNode, writer );
-						writer.closeNode();
-					}else if( nodeName.equalsIgnoreCase( "code" ) ){
-						writer.openNode( "text:span" );
-							writer.addAttribute( "text:style-name", "TCode" );
-							serialize( tagNode, writer );
-						writer.closeNode();
-					}else if( nodeName.equalsIgnoreCase( "sup" ) ){
-						writer.openNode( "text:span" );
-							writer.addAttribute( "text:style-name", "TSup" );
-							serialize( tagNode, writer );
-						writer.closeNode();
-					}else if( nodeName.equalsIgnoreCase( "sub" ) ){
-						writer.openNode( "text:span" );
-							writer.addAttribute( "text:style-name", "TSub" );
-							serialize( tagNode, writer );
-						writer.closeNode();
+							properties.setProperties( oldProperties );
+						writer.closeUntilParent( "text:span" );
+						if( parrafoAuto )
+							writer.closeUntilParent( "text:p" );
 					}else if( nodeName.equalsIgnoreCase( "a" ) ){
 						writer.openNode( "text:a" );
 							writer.addAttribute( "xlink:type", "simple" );
@@ -95,13 +119,10 @@ final class ODTRecorders extends Recorders{
 								serialize( tagNode, writer );
 						writer.closeNode();
 					}else if( nodeName.equalsIgnoreCase( "p" ) ){
-						/*
-						 * FIXME MODIFICAR esta ñapa que cierra el párrafo abierto anteriormente,
-						 * evitando anidar párrafos, dentro del párrafo del comentario. Aunque no
-						 * chequea que pueda haber más párrafos anidados dentro del propio comentario.
-						 */
-						writer.insert( "</text:p><text:p text:style-name=\"Standard\">" );
-						serialize( tagNode, writer );
+						writer.closeUntilParent("text:p");
+						writer.openNode( "text:p" );
+							serialize( tagNode, writer );
+						writer.closeUntilParent("text:p");
 					}else if( nodeName.equalsIgnoreCase( "img" ) ){
 						String src = tagNode.getAttributeByName( "src" );
 						if( src != null && src.length() > 0 ){
@@ -128,25 +149,37 @@ final class ODTRecorders extends Recorders{
 							writer.closeNode();
 						}
 					}else if( nodeName.equalsIgnoreCase( "ol" ) ){
-
+						writer.closeUntilParent("text:p");
+						writer.openNode( "text:list" );
+							serialize( tagNode, writer );
+						writer.closeNode();
 					}else if( nodeName.equalsIgnoreCase( "ul" ) ){
-
+						writer.closeUntilParent("text:p");
+						writer.openNode( "text:list" );
+							serialize( tagNode, writer );
+						writer.closeNode();
 					}else if( nodeName.equalsIgnoreCase( "li" ) ){
-
+						writer.openNode( "text:list-item" );
+							serialize( tagNode, writer );
+						writer.closeNode();
 					}else{
-						writer.openNode( "text:span" );
-							writer.addAttribute( "text:style-name", "AutoStyleB" );
-							writer.write( "¡¡¡ Etiqueta " );
-							writer.write( nodeName );
-							writer.write( " no soportada !!!" );
-						writer.closeNode();
-						serialize( tagNode, writer );
-						writer.openNode( "text:span" );
-							writer.addAttribute( "text:style-name", "AutoStyleB" );
-							writer.write( "¡¡¡ Fin " );
-							writer.write( nodeName );
-							writer.write( " !!!" );
-						writer.closeNode();
+						if( tagNode.getChildren().size() == 0 )
+							writer.write( "<" + nodeName +">" );
+						else{
+							writer.openNode( "text:span" );
+								writer.addAttribute( "text:style-name", "AutoStyleB" );
+								writer.write( "¡¡¡ Etiqueta " );
+								writer.write( nodeName );
+								writer.write( " no soportada !!!" );
+							writer.closeNode();
+							serialize( tagNode, writer );
+							writer.openNode( "text:span" );
+								writer.addAttribute( "text:style-name", "AutoStyleB" );
+								writer.write( "¡¡¡ Fin " );
+								writer.write( nodeName );
+								writer.write( " !!!" );
+							writer.closeNode();
+						}
 					}
 				}
 			}
@@ -159,7 +192,7 @@ final class ODTRecorders extends Recorders{
 			writer.openNode( "text:p" );
 				writer.addAttribute( "text:style-name", style );
 				FORMATER.format( content, writer );
-			writer.closeNode();
+			writer.closeUntilParent("text:p");
 		}
 	}
 	
@@ -181,7 +214,7 @@ final class ODTRecorders extends Recorders{
 				writer.write( title );
 				for( T t: collection )
 					mapper.getRecorder( t.getClass() ).record( t, writer, mapper );
-			writer.closeNode();
+			writer.closeUntilParent("text:p");
 		}
 	}
 	
@@ -269,7 +302,7 @@ final class ODTRecorders extends Recorders{
 					writer.emptyNode( "text:tab" );
 					FORMATER.format( t.documentation, writer );
 				}
-			writer.closeNode();
+			writer.closeUntilParent("text:p");
 			writeParagraph( "Mire También:", t.links, writer, mapper );
 		}
 	}
@@ -306,7 +339,7 @@ final class ODTRecorders extends Recorders{
 					writer.emptyNode( "text:tab" );
 					FORMATER.format( t.documentation, writer );
 				}
-			writer.closeNode();
+			writer.closeUntilParent("text:p");
 			writeParagraph( "Mire También:", t.links, writer, mapper );
 		}
 	}
@@ -358,7 +391,7 @@ final class ODTRecorders extends Recorders{
 					writer.addAttribute( "text:style-name", "Estilo" );	
 					writer.write( "Devuelve:" );
 					mapper.getRecorder( ReturnTypeBinding.class ).record( t.returnType, writer, mapper );
-				writer.closeNode();
+				writer.closeUntilParent("text:p");
 			}
 			writeParagraph( "Mire También:", t.links, writer, mapper );
 //				writer.openNode("Method");
