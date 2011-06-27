@@ -149,9 +149,8 @@ public class ClaseDePrueba<E> {
 			this.accion = accion;
 		}
 		/**
-		 * Documentación del método {@code accion}.
-		
-		 * @return valor devuelto: */
+		 * Documentación del método {@code getAccion()}.
+		 * @return valor devuelto*/
 		public final String getAccion(){
 			return accion;
 		}
@@ -159,6 +158,9 @@ public class ClaseDePrueba<E> {
 	
 	/**
 	 * Documentación de la enumeración {@code ColorPrimario}.
+	 * </p>
+	 * hola <u>qué tal?<b>muy bien</u> tocando <br>
+	 * las narices</b> bla <u>bla <i>bla</u> ldsfas <a href="www.dir.org" fasdf="fasdhfkj">link</a>
 	 */
 	public static enum ColorPrimario{
 		/** {@code ColorPrimario} que representa el color: ROJO*/

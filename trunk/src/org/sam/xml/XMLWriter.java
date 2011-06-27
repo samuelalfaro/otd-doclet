@@ -439,6 +439,20 @@ public final class XMLWriter{
 		addAttribute( name, value.toString() );
 	}
 	
+	public void discardAttributes(){
+		if( isClosedStartNode )
+			throw new IllegalStateException();
+		attributes.setLength( 0 );
+	}
+	
+	public String nodeName(){
+		return  nodeStack.size() == 0 ? "": nodeStack.peek().name;
+	}
+	
+	public boolean hasContent(){
+		return hasContent;
+	}
+	
 	private void write( String content, StringDigester digester ) throws IOException{
 		hasContent = content != null && content.length() > 0;
 		if( hasContent ){
@@ -495,5 +509,20 @@ public final class XMLWriter{
 	public void emptyNode( String nodeName ) throws IOException{
 		openNode( nodeName );
 		closeNode();
+	}
+	
+	public boolean hasParent( String nodeName ){
+		for( Node node: nodeStack )
+			if( node.name.equals( nodeName ) )
+				return true;
+		return false;
+	}
+	
+	public void closeUntilParent( String nodeName ) throws IOException{
+		if( hasParent( nodeName ) ){
+			while( !nodeStack.peek().name.equals( nodeName ) )
+				closeNode();
+			closeNode();
+		}
 	}
 }

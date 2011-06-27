@@ -114,6 +114,14 @@ public class ODTHelper{
 			return ( properties & IS_UNDERLINE_MASK ) != 0;
 		}
 		
+		public void setProperties( byte properties ){
+			this.properties = properties;
+		}
+
+		public byte getProperties(){
+			return this.properties;
+		}
+		
 		public String toString(){
 			StringBuilder builder = new StringBuilder("AutoStyle");
 			if( isSup() )

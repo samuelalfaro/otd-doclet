@@ -56,8 +56,8 @@ import com.sun.javadoc.RootDoc;
 public final class ODTDoclet{
 
 	static final Charset UTF8 = Charset.forName( "UTF-8" );
-	static final int dpi = 120;
-	static final double scaleFactor = 1.0;
+	static final int dpi = 300;
+	static final double scaleFactor = dpi / 120.0;
 
 	private static class ManifestGenerator{
 
@@ -205,12 +205,6 @@ public final class ODTDoclet{
 		}
 		zin.close();
 
-		//ContentGenerator content = new ContentGenerator();
-
-		// FIXME 
-		/* Almacenar el classBinding junto a las dimensiones de la imagen generada
-		 * Usar el writer, para insertar la imagen, y el título.
-		 */
 		Queue<Par<ClassBinding, Graphic>> classes = new LinkedList<Par<ClassBinding, Graphic>>();
 		for( ClassDoc classDoc: root.classes() )
 			try{
