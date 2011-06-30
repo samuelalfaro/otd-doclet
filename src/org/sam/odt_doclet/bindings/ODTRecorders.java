@@ -94,13 +94,13 @@ final class ODTRecorders extends Recorders{
 						if( parrafoAuto )
 							writer.openNode( "text:p" );
 						if( writer.hasParent( "text:span" ) ){
-							if( writer.nodeName().equalsIgnoreCase( "text:span" ) && !writer.hasContent() )
+							if( writer.getCurrentNodeName().equalsIgnoreCase( "text:span" ) && !writer.currentNodeHasContent() )
 								writer.discardAttributes();
 							else{
 								writer.closeUntilParent( "text:span" );
 							}
 						}
-						if( !writer.nodeName().equalsIgnoreCase( "text:span" ) ){
+						if( !writer.getCurrentNodeName().equalsIgnoreCase( "text:span" ) ){
 							writer.openNode( "text:span" );	
 						}
 							writer.addAttribute( "text:style-name", properties.toString() );

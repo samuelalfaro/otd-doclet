@@ -445,14 +445,6 @@ public final class XMLWriter{
 		attributes.setLength( 0 );
 	}
 	
-	public String nodeName(){
-		return  nodeStack.size() == 0 ? "": nodeStack.peek().name;
-	}
-	
-	public boolean hasContent(){
-		return hasContent;
-	}
-	
 	private void write( String content, StringDigester digester ) throws IOException{
 		hasContent = content != null && content.length() > 0;
 		if( hasContent ){
@@ -471,6 +463,7 @@ public final class XMLWriter{
 	/**
 	 * Method writeCDATA.
 	 * @param content String
+	 * TODO cambiar a insertCDATANode
 	 */
 	public void writeCDATA( String content ) throws IOException{
 		write( content, StringDigester.CDATA );
@@ -511,13 +504,21 @@ public final class XMLWriter{
 		closeNode();
 	}
 	
+	public String getCurrentNodeName(){
+		return  nodeStack.size() == 0 ? "": nodeStack.peek().name;
+	}
+	
+	public boolean currentNodeHasContent(){
+		return hasContent;
+	}
+	
 	public boolean hasParent( String nodeName ){
 		for( Node node: nodeStack )
 			if( node.name.equals( nodeName ) )
 				return true;
 		return false;
 	}
-	
+
 	public void closeUntilParent( String nodeName ) throws IOException{
 		if( hasParent( nodeName ) ){
 			while( !nodeStack.peek().name.equals( nodeName ) )

@@ -1,5 +1,5 @@
 /* 
- * SinkAbs.java
+ * OutputProcessor.java
  * 
  * Copyright (c) 2011 Samuel Alfaro Jiménez <samuelalfaro at gmail dot com>.
  * All rights reserved.
@@ -22,44 +22,16 @@
 package org.sam.pipeline;
 
 import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import java.io.OutputStream;
 
 /**
  */
-public abstract class SinkAbs<T> extends PipeConectorAbs implements Sink<T>{
+public interface OutputProcessor{
 
 	/**
-	 * @param source
+	 * @param out
 	 * @throws IOException
 	 */
-	public SinkAbs( OutputProcessor source ) throws IOException{
-		super( source );
-	}
+	void process( OutputStream out ) throws IOException;
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.sam.pipeline.Sink#process()
-	 */
-	@Override
-	public final void process() throws IOException{
-		if( sourceProcessor == null )
-			throw new RuntimeException( "Source is null" );
-
-		PipedOutputStream pipeOut = new PipedOutputStream();
-		sourceProcessor.setOutput( pipeOut );
-		Thread sourceThread = new Thread( sourceProcessor );
-
-		PipedInputStream pipeIn;
-		pipeIn = new PipedInputStream();
-		pipeIn.connect( pipeOut );
-
-		sourceThread.start();
-		process( pipeIn );
-		try{
-			sourceThread.join();
-		}catch( InterruptedException e ){
-			e.printStackTrace();
-		}
-	}
 }
