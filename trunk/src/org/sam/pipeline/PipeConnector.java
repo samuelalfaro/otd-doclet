@@ -26,13 +26,12 @@ import java.io.IOException;
 /**
  * 
  */
-public interface PipeConnector {
+public interface PipeConnector{
 
 	/**
-	 * Method setPump.
-	 * @param pump Pump
+	 * @param source
 	 * @throws IOException
 	 */
-	void setPump(Pump pump) throws IOException;
-	
+	void setSource( OutputProcessor source ) throws IOException;
+
 }

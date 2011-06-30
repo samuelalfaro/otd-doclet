@@ -27,15 +27,14 @@ import java.io.OutputStream;
 
 /**
  */
-public interface Filter extends PipeConnector, Pump {
-	
+public interface Filter extends PipeConnector, OutputProcessor{
+
 	/**
-	 * Method process.
-	 * @param in InputStream
-	 * @param out OutputStream
+	 * @param in
+	 * @param out
 	 * @throws IOException
 	 * @throws FilterException
 	 */
-	void process(InputStream in, OutputStream out) throws IOException, FilterException;
-	
+	void process( InputStream in, OutputStream out ) throws IOException, FilterException;
+
 }

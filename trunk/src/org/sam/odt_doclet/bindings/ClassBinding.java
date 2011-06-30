@@ -54,26 +54,17 @@ import com.sun.javadoc.SourcePosition;
 import com.sun.javadoc.Tag;
 import com.sun.javadoc.ThrowsTag;
 
-/**
- */
 final class Strings{
 	
 	private Strings(){}
 	
-	/**
-	 * Field CaseSensitiveComparator.
-	 * Value: {@value CaseSensitiveComparator}
-	 */
 	static final Comparator<String> CaseSensitiveComparator = new Comparator<String>(){
 		public int compare(String o1, String o2) {
 			return o1.compareTo(o2);
 		}
 	};
-
 }
 
-/**
- */
 final class AssertHelper{
 	
 	private AssertHelper(){}

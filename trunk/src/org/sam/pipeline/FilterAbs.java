@@ -35,8 +35,8 @@ public abstract class FilterAbs extends PipeConectorAbs implements Filter{
 	 * @param pump Pump
 	 * @throws IOException
 	 */
-	public FilterAbs( Pump pump ) throws IOException{
-		super( pump );
+	public FilterAbs( OutputProcessor source ) throws IOException{
+		super( source );
 	}
 
 	/*
@@ -45,12 +45,12 @@ public abstract class FilterAbs extends PipeConectorAbs implements Filter{
 	 */
 	@Override
 	public final void process( OutputStream out ) throws IOException{
-		if( pump == null )
+		if( sourceProcessor == null )
 			throw new RuntimeException( "Source is null" );
 
 		PipedOutputStream pipeOut = new PipedOutputStream();
-		pump.setOutput( pipeOut );
-		Thread sourceThread = new Thread( pump );
+		sourceProcessor.setOutput( pipeOut );
+		Thread sourceThread = new Thread( sourceProcessor );
 
 		PipedInputStream pipeIn;
 		pipeIn = new PipedInputStream();

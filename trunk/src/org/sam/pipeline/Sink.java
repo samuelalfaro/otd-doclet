@@ -27,7 +27,7 @@ import java.io.InputStream;
 /**
  * 
  */
-public interface Sink extends PipeConnector {
+public interface Sink<T> extends PipeConnector {
 	
 	/**
 	 * Method process.
@@ -42,5 +42,10 @@ public interface Sink extends PipeConnector {
 	 * @throws FilterException
 	 */
 	void process(InputStream in) throws IOException, FilterException;
+	
+	/**
+	 * @return El objeto producto del proceso.
+	 */
+	T getDestination();
 	
 }

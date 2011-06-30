@@ -30,17 +30,17 @@ abstract class PipeConectorAbs implements PipeConnector{
 
 	/**
 	 */
-	static class RunnablePump implements Runnable{
+	static class SourceProcessor implements Runnable{
 
-		private final Pump pump;
+		private final OutputProcessor source;
 		private OutputStream out;
 
 		/**
 		 * Constructor for RunnablePump.
 		 * @param pump Pump
 		 */
-		RunnablePump( Pump pump ){
-			this.pump = pump;
+		SourceProcessor( OutputProcessor source ){
+			this.source = source;
 		}
 
 		/**
@@ -49,7 +49,7 @@ abstract class PipeConectorAbs implements PipeConnector{
 		 */
 		public void run(){
 			try{
-				pump.process( out );
+				source.process( out );
 				out.flush();
 				out.close();
 			}catch( IOException e ){
@@ -66,23 +66,21 @@ abstract class PipeConectorAbs implements PipeConnector{
 		}
 	}
 
-	RunnablePump pump;
+	SourceProcessor sourceProcessor;
 
 	/**
-	 * Constructor for PipeConectorAbs.
-	 * @param pump Pump
+	 * @param source
 	 * @throws IOException
 	 */
-	PipeConectorAbs( Pump pump ) throws IOException{
-		setPump( pump );
+	PipeConectorAbs( OutputProcessor source ) throws IOException{
+		setSource( source );
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.sam.pipeline.PipeConnector#setPump(org.sam.pipeline.Pump)
+	/* (non-Javadoc)
+	 * @see org.sam.pipeline.PipeConnector#setSource(org.sam.pipeline.OutputProcessor)
 	 */
 	@Override
-	public final void setPump( Pump pump ) throws IOException{
-		this.pump = new RunnablePump( pump );
+	public final void setSource( OutputProcessor source ) throws IOException{
+		this.sourceProcessor = new SourceProcessor( source );
 	}
 }
