@@ -11,9 +11,10 @@ import java.util.Queue;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.apache.batik.transcoder.TranscoderException;
+import javax.xml.transform.TransformerConfigurationException;
+
 import org.sam.odt_doclet.bindings.ClassBindingFactory;
-import org.sam.odt_doclet.pipeline.PipeLine;
+import org.sam.odt_doclet.pipeline.UMLDiagramGenerator;
 
 /**
  */
@@ -113,11 +114,11 @@ public class GenerateImages {
 	}
 	
 	/**
-	 * @param args ignorados
+	 * @param args
 	 * @throws IOException
-	 * @throws TranscoderException
+	 * @throws TransformerConfigurationException
 	 */
-	public static void main( String[] args ) throws IOException, TranscoderException{
+	public static void main( String[] args ) throws IOException, TransformerConfigurationException{
 
 		File root = new File( "/media/DATA/Samuel/Proyectos/jspacewars/bin" );
 		String rootPath = root.getCanonicalPath();
@@ -130,6 +131,8 @@ public class GenerateImages {
 		SortedSet<Class<?>> packageInterfacesSet = new TreeSet<Class<?>>( COMPARADOR_DE_INTERFACES );
 		packageClassesCollection = new LinkedList<Class<?>>();
 		SortedSet<Class<?>> listadoDeClasesOrdenado = new TreeSet<Class<?>>( COMPARADOR_DE_CLASES );
+		
+		UMLDiagramGenerator generator = new UMLDiagramGenerator();
 
 		for( File pack: getPackages( root ) ){
 			String packageName = getPackageName( pack, rootPath );
@@ -139,7 +142,7 @@ public class GenerateImages {
 				System.out.format( "package: %s\n", packageName.length() > 0 ? packageName: "(default  package)" );
 				for( Class<?> clazz: packageInterfacesSet ){
 					System.out.print( "\t" + clazz.getCanonicalName() );
-					Dimension d = PipeLine.toPNG( 
+					Dimension d = generator.toPNG( 
 							ClassBindingFactory.createBinding( clazz ),
 							new FileOutputStream( "output/" + clazz.getCanonicalName() + ".png" )
 					);
@@ -147,7 +150,7 @@ public class GenerateImages {
 					System.out.println( "\t[ " + cmDim.width + " x " + cmDim.height + " ]" );
 
 					for( Class<?> subclazz: clazz.getDeclaredClasses() )
-						PipeLine.toPNG( 
+						generator.toPNG( 
 								ClassBindingFactory.createBinding( subclazz ),
 								new FileOutputStream( "output/" + subclazz.getCanonicalName() + ".png" )
 						);
@@ -158,7 +161,7 @@ public class GenerateImages {
 						listadoDeClasesOrdenado.add( clazz );
 					for( Class<?> clazz: listadoDeClasesOrdenado ){
 						System.out.print( "\t" + clazz.getCanonicalName() );
-						Dimension d = PipeLine.toPNG( 
+						Dimension d = generator.toPNG( 
 								ClassBindingFactory.createBinding( clazz ),
 								new FileOutputStream( "output/" + clazz.getCanonicalName() + ".png" )
 						);
@@ -166,7 +169,7 @@ public class GenerateImages {
 						System.out.println( "\t[ " + cmDim.width + " x " + cmDim.height + " ]" );
 
 						for( Class<?> subclazz: clazz.getDeclaredClasses() )
-							PipeLine.toPNG( 
+							generator.toPNG( 
 									ClassBindingFactory.createBinding( subclazz ),
 									new FileOutputStream( "output/" + subclazz.getCanonicalName() + ".png" )
 							);

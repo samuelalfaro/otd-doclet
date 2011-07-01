@@ -30,23 +30,17 @@ abstract class PipeConectorAbs implements PipeConnector{
 
 	/**
 	 */
-	static class SourceProcessor implements Runnable{
+	private static class SourceProcessor implements Runnable{
 
-		private final OutputProcessor source;
-		private OutputStream out;
+		OutputProcessor source;
+		OutputStream out;
+		
+		SourceProcessor(){}
 
-		/**
-		 * Constructor for RunnablePump.
-		 * @param pump Pump
+		/* (non-Javadoc)
+		 * @see java.lang.Thread#run()
 		 */
-		SourceProcessor( OutputProcessor source ){
-			this.source = source;
-		}
-
-		/**
-		 * Method run.
-		 * @see java.lang.Runnable#run()
-		 */
+		@Override
 		public void run(){
 			try{
 				source.process( out );
@@ -56,31 +50,37 @@ abstract class PipeConectorAbs implements PipeConnector{
 				e.printStackTrace();
 			}
 		}
-
-		/**
-		 * Method setOutput.
-		 * @param out OutputStream
-		 */
-		public void setOutput( OutputStream out ){
-			this.out = out;
-		}
 	}
 
-	SourceProcessor sourceProcessor;
-
+	private final SourceProcessor sourceProcessor;
+	
 	/**
-	 * @param source
-	 * @throws IOException
+	 * 
 	 */
-	PipeConectorAbs( OutputProcessor source ) throws IOException{
-		setSource( source );
+	PipeConectorAbs(){
+		sourceProcessor = new SourceProcessor();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.sam.pipeline.PipeConnector#setSource(org.sam.pipeline.OutputProcessor)
 	 */
 	@Override
-	public final void setSource( OutputProcessor source ) throws IOException{
-		this.sourceProcessor = new SourceProcessor( source );
+	public final void setSource( OutputProcessor source ){
+		this.sourceProcessor.source = source;
+	}
+	
+	final void setSourceOutput( OutputStream out ){
+		this.sourceProcessor.out = out;
+	}
+	
+	private transient Thread sourceThread;
+	
+	final void processSource(){
+		sourceThread = new Thread( sourceProcessor );
+		sourceThread.start();
+	}
+	
+	final void joinSource() throws InterruptedException{
+		sourceThread.join();
 	}
 }

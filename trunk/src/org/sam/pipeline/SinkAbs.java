@@ -29,35 +29,23 @@ import java.io.PipedOutputStream;
  */
 public abstract class SinkAbs<T> extends PipeConectorAbs implements Sink<T>{
 
-	/**
-	 * @param source
-	 * @throws IOException
-	 */
-	public SinkAbs( OutputProcessor source ) throws IOException{
-		super( source );
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.sam.pipeline.Sink#process()
 	 */
 	@Override
 	public final void process() throws IOException{
-		if( sourceProcessor == null )
-			throw new RuntimeException( "Source is null" );
-
 		PipedOutputStream pipeOut = new PipedOutputStream();
-		sourceProcessor.setOutput( pipeOut );
-		Thread sourceThread = new Thread( sourceProcessor );
+		setSourceOutput( pipeOut );
 
 		PipedInputStream pipeIn;
 		pipeIn = new PipedInputStream();
 		pipeIn.connect( pipeOut );
 
-		sourceThread.start();
+		processSource();
 		process( pipeIn );
 		try{
-			sourceThread.join();
+			joinSource();
 		}catch( InterruptedException e ){
 			e.printStackTrace();
 		}

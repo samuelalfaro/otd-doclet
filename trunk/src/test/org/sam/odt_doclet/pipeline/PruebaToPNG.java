@@ -25,7 +25,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import javax.xml.transform.TransformerConfigurationException;
+
+import org.sam.odt_doclet.bindings.ClassBinding;
 import org.sam.odt_doclet.bindings.ClassBindingFactory;
+import org.sam.odt_doclet.bindings.Recorders;
+import org.sam.xml.XMLConverter;
+import org.sam.xml.XMLWriter;
 
 /**
  * 
@@ -36,9 +42,9 @@ public class PruebaToPNG {
 	 * @param args
 	 * @throws FileNotFoundException
 	 * @throws IOException
-	 * @throws ClassNotFoundException
+	 * @throws TransformerConfigurationException
 	 */
-	public static void main(String[] args) throws FileNotFoundException, IOException, ClassNotFoundException {
+	public static void main(String[] args) throws FileNotFoundException, IOException, TransformerConfigurationException {
 		
 		Class<?> clazz;
 		/*
@@ -55,10 +61,17 @@ public class PruebaToPNG {
 		/*/
 		clazz = pruebas.ClaseDePrueba.class;
 		//*/
+		ClassBinding clazzBinding = ClassBindingFactory.createBinding( clazz );
+		
+		XMLConverter converter = new XMLConverter();
+		Recorders.register( Recorders.Mode.XML, converter );
+		UMLDiagramGenerator generator = new UMLDiagramGenerator();
 	
-		PipeLine.toXML( ClassBindingFactory.createBinding( clazz ), System.out );
+		converter.setWriter( new XMLWriter( (Appendable)System.out ) );
+		converter.write( clazzBinding );
+		
 		System.out.print("\nGenerando gráfico de "+clazz.getSimpleName()+" ...");
-		PipeLine.toPNG( ClassBindingFactory.createBinding( clazz ), new FileOutputStream( "output/out.png" ) );
+		generator.toPNG( clazzBinding, new FileOutputStream( "output/out.png" ) );
 		System.out.println("\tok");
 	}
 }
