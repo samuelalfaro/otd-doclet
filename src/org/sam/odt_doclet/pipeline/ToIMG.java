@@ -7,7 +7,6 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 
 import org.sam.pipeline.FilterException;
-import org.sam.pipeline.OutputProcessor;
 import org.sam.pipeline.SinkAbs;
 
 /**
@@ -15,14 +14,6 @@ import org.sam.pipeline.SinkAbs;
 class ToIMG extends SinkAbs<BufferedImage>{
 
 	private BufferedImage destination;
-
-	/**
-	 * @param source
-	 * @throws IOException
-	 */
-	ToIMG( OutputProcessor source ) throws IOException{
-		super( source );
-	}
 
 	/*
 	 * (non-Javadoc)

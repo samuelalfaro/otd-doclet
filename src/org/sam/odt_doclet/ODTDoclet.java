@@ -40,10 +40,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import javax.xml.transform.TransformerConfigurationException;
+
 import org.sam.odt_doclet.bindings.ClassBinding;
 import org.sam.odt_doclet.bindings.ClassBindingFactory;
 import org.sam.odt_doclet.bindings.Recorders;
-import org.sam.odt_doclet.pipeline.PipeLine;
+import org.sam.odt_doclet.pipeline.UMLDiagramGenerator;
 import org.sam.xml.XMLConverter;
 import org.sam.xml.XMLWriter;
 
@@ -179,8 +181,9 @@ public final class ODTDoclet{
 	 * @param resultFile
 	 * @param root
 	 * @throws IOException
+	 * @throws TransformerConfigurationException 
 	 */
-	public static void generarODT( InputStream plantilla, File resultFile, RootDoc root ) throws IOException{
+	public static void generarODT( InputStream plantilla, File resultFile, RootDoc root ) throws IOException, TransformerConfigurationException{
 
 		byte[] buf = new byte[4096];
 
@@ -206,6 +209,9 @@ public final class ODTDoclet{
 		zin.close();
 
 		Queue<Par<ClassBinding, Graphic>> classes = new LinkedList<Par<ClassBinding, Graphic>>();
+		UMLDiagramGenerator generator = new UMLDiagramGenerator();
+		generator.setScale( scaleFactor );
+		
 		for( ClassDoc classDoc: root.classes() )
 			try{
 				ClassBinding clazz = ClassBindingFactory.createBinding( classDoc );
@@ -215,7 +221,7 @@ public final class ODTDoclet{
 				
 				out.putNextEntry( new ZipEntry( pictPath ) );
 					manifest.addImage( pictPath );
-					Dimension dim = PipeLine.toPNG( clazz, scaleFactor, out );
+					Dimension dim = generator.toPNG( clazz, out );
 				out.closeEntry();
 				classes.offer( new Par<ClassBinding, Graphic>( clazz, new Graphic( pictName, pictPath, dim, dpi ) ) );
 			}catch( ClassNotFoundException e ){
@@ -276,6 +282,9 @@ public final class ODTDoclet{
 			generarODT( Loader.getResourceAsStream( "resources/plantilla.odt" ), fileOutput, root );
 			return true;
 		}catch( IOException e ){
+			e.printStackTrace();
+			return false;
+		}catch( TransformerConfigurationException e ){
 			e.printStackTrace();
 			return false;
 		}

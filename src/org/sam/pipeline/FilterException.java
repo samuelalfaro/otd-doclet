@@ -24,14 +24,14 @@ package org.sam.pipeline;
 /**
  * 
  */
-@SuppressWarnings("serial")
-public class FilterException extends RuntimeException {
+@SuppressWarnings( "serial" )
+public class FilterException extends RuntimeException{
 
 	/**
 	 * @param message
 	 * @param cause
 	 */
-	public FilterException(String message, Throwable cause) {
-		super(message, cause);
+	public FilterException( String message, Throwable cause ){
+		super( message, cause );
 	}
 }

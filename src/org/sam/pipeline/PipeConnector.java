@@ -32,6 +32,6 @@ public interface PipeConnector{
 	 * @param source
 	 * @throws IOException
 	 */
-	void setSource( OutputProcessor source ) throws IOException;
+	void setSource( OutputProcessor source );
 
 }

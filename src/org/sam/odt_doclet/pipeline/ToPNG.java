@@ -14,7 +14,6 @@ import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.sam.odt_doclet.Loader;
 import org.sam.pipeline.FilterAbs;
 import org.sam.pipeline.FilterException;
-import org.sam.pipeline.OutputProcessor;
 
 /**
  */
@@ -24,13 +23,12 @@ class ToPNG extends FilterAbs{
 	private final String uri;
 
 	/**
-	 * @param source
-	 * @throws IOException
+	 * 
 	 */
-	ToPNG( OutputProcessor source ) throws IOException{
-		super( source );
+	ToPNG(){
 		transcoder = new PNGTranscoder();
 		transcoder.addTranscodingHint( SVGAbstractTranscoder.KEY_EXECUTE_ONLOAD, Boolean.TRUE );
+		// FIXME Sacar fuera del constructor.
 		uri = new File( Loader.getRunPath() + "resources" ).toURI().toString();
 	}
 

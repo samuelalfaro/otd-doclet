@@ -25,7 +25,7 @@ import java.awt.Dimension;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
-class BigDecimalDimension {
+public class BigDecimalDimension {
 	
 	private static final MathContext mc = new MathContext( 3 );
 
