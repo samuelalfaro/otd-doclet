@@ -35,6 +35,11 @@ public class BigDecimalDimension {
 	public final BigDecimal width;
 	public final BigDecimal height;
 	
+	public BigDecimalDimension( String width, String height ){
+		this.width  = new BigDecimal( width, mc );
+		this.height = new BigDecimal( height, mc );
+	}
+	
 	private BigDecimalDimension( BigDecimal width, BigDecimal height ){
 		this.width  = width;
 		this.height = height;
@@ -58,13 +63,42 @@ public class BigDecimalDimension {
 		);
 	}
 	
-	
 	public static BigDecimalDimension toInches( Dimension dim, int dpi ){
 		BigDecimal divisor = new BigDecimal( Integer.toString( dpi ) );
 		
 		return new BigDecimalDimension(
 			new BigDecimal( Integer.toString( dim.width ) ).divide( divisor, mc  ),
 			new BigDecimal( Integer.toString( dim.height ) ).divide( divisor, mc  )
+		);
+	}
+	
+	private static final BigDecimal round = new BigDecimal( "0.5" );
+	
+	public Dimension CentimetersToPixels( int dpi ){
+		BigDecimal multiplier = new BigDecimal( Integer.toString( dpi ) );
+		
+		return new Dimension( 
+			this.width.multiply( multiplier ).divide( INCH_TO_CM, mc ).add( round ).intValue(),
+			this.height.multiply( multiplier ).divide( INCH_TO_CM, mc ).add( round ).intValue()
+		);
+	}
+
+	public Dimension MilimetersToPixels( int dpi ){
+		BigDecimal multiplier = new BigDecimal( Integer.toString( dpi ) );
+		
+		return new Dimension( 
+			this.width.multiply( multiplier ).divide( INCH_TO_MM, mc ).add( round ).intValue(),
+			this.height.multiply( multiplier ).divide( INCH_TO_MM, mc ).add( round ).intValue()
+		);
+	}
+	
+	
+	public Dimension InchesToPixels( int dpi ){
+		BigDecimal multiplier = new BigDecimal( Integer.toString( dpi ) );
+		
+		return new Dimension( 
+			this.width.multiply( multiplier ).add( round ).intValue(),
+			this.height.multiply( multiplier ).add( round ).intValue()
 		);
 	}
 }
