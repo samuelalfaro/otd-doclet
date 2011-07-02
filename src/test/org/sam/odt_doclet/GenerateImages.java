@@ -14,7 +14,7 @@ import java.util.TreeSet;
 import javax.xml.transform.TransformerConfigurationException;
 
 import org.sam.odt_doclet.bindings.ClassBindingFactory;
-import org.sam.odt_doclet.pipeline.UMLDiagramGenerator;
+import org.sam.odt_doclet.graphics.UMLDiagramGenerator;
 
 /**
  */

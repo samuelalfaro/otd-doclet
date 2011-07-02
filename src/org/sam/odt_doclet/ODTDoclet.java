@@ -45,7 +45,7 @@ import javax.xml.transform.TransformerConfigurationException;
 import org.sam.odt_doclet.bindings.ClassBinding;
 import org.sam.odt_doclet.bindings.ClassBindingFactory;
 import org.sam.odt_doclet.bindings.Recorders;
-import org.sam.odt_doclet.pipeline.UMLDiagramGenerator;
+import org.sam.odt_doclet.graphics.UMLDiagramGenerator;
 import org.sam.xml.XMLConverter;
 import org.sam.xml.XMLWriter;
 
