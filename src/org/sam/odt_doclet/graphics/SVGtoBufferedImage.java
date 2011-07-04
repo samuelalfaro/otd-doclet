@@ -1,5 +1,5 @@
 /* 
- * ToBufferedImage.java
+ * SVGtoBufferedImage.java
  * 
  * Copyright (c) 2011 Samuel Alfaro Jiménez <samuelalfaro at gmail dot com>.
  * All rights reserved.
