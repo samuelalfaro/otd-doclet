@@ -126,7 +126,7 @@ public final class BulletGenerator{
 	 */
 	public void write( Bullet bullet, OutputStream out ) throws IOException{
 		processor.setSource( bullet );
-		toPNG.process( out );
+		SVGtoPNG.process( out );
 	}
 	
 	public static void main( String... args ) throws FileNotFoundException, IOException{

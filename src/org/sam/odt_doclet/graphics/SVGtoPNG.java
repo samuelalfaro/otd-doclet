@@ -17,17 +17,17 @@ import org.sam.pipeline.FilterException;
 /**
  */
 final class SVGtoPNG extends FilterAbs{
-
-	private final ImageTranscoder transcoder;
+	
 	private final String uri;
-
+	private final ImageTranscoder transcoder;
+	
 	/**
 	 * 
 	 */
 	SVGtoPNG( URI uri ){
+		this.uri = uri.toString();
 		transcoder = new PNGTranscoder();
 		transcoder.addTranscodingHint( SVGAbstractTranscoder.KEY_EXECUTE_ONLOAD, Boolean.TRUE );
-		this.uri = uri.toString();
 	}
 
 	/*
@@ -42,7 +42,7 @@ final class SVGtoPNG extends FilterAbs{
 		try{
 			transcoder.transcode( input, output );
 		}catch( TranscoderException e ){
-			throw new FilterException( "ToPNG Error!!!", e );
+			throw new FilterException( "Image Transcoder Error!!!", e );
 		}
 	}
 }

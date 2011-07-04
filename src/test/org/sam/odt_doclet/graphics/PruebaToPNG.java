@@ -72,6 +72,7 @@ public class PruebaToPNG {
 		converter.write( clazzBinding );
 		
 		System.out.print("\nGenerando gráfico de "+clazz.getSimpleName()+" ...");
+		generator.toSVG( clazzBinding, System.out );
 		generator.toPNG( clazzBinding, new FileOutputStream( "output/out.png" ) );
 		System.out.println("\tok");
 	}

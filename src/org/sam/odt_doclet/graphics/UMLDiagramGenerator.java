@@ -113,15 +113,15 @@ public final class UMLDiagramGenerator{
 	private final ToSVG               toSVG;
 	private final Filter              toPNG;
 	private final Sink<BufferedImage> toIMG;
-	
+
 	public UMLDiagramGenerator() throws TransformerConfigurationException{
 		toXML = new ToXML();
 		toSVG = new ToSVG();
 		toSVG.setSource( toXML );
 		toPNG = new SVGtoPNG( new File( Loader.getRunPath() + "resources" ).toURI() );
 		toPNG.setSource( toSVG );
-		toIMG = new ImageStreamToBufferedImage();
-		toIMG.setSource( toPNG );
+		toIMG = new SVGtoBufferedImage( new File( Loader.getRunPath() + "resources" ).toURI() );
+		toIMG.setSource( toSVG );
 		
 		setScale(1.0);
 	}
