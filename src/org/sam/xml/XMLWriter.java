@@ -333,9 +333,11 @@ public final class XMLWriter{
 	public void addAttribute( String name, String value ) throws IOException{
 		if( isClosedStartNode )
 			throw new IllegalStateException();
-		attributes.append( ' ' ).append( name ).append( "=\"" );
-		StringDigester.XMLCharsFilter.digestString( value, attributes );
-		attributes.append( '\"' );
+		if( value != null && value.length() > 0 ){
+			attributes.append( ' ' ).append( name ).append( "=\"" );
+			StringDigester.XMLCharsFilter.digestString( value, attributes );
+			attributes.append( '\"' );
+		}
 	}
 	
 	/**
@@ -436,7 +438,8 @@ public final class XMLWriter{
 	 * @param value Object
 	 */
 	public void addAttribute( String name, Object value ) throws IOException{
-		addAttribute( name, value.toString() );
+		if( value != null )
+			addAttribute( name, value.toString() );
 	}
 	
 	public void discardAttributes(){

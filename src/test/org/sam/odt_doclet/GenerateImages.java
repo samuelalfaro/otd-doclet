@@ -13,6 +13,7 @@ import java.util.TreeSet;
 
 import javax.xml.transform.TransformerConfigurationException;
 
+import org.sam.odt_doclet.UnitsDimension.Units;
 import org.sam.odt_doclet.bindings.ClassBindingFactory;
 import org.sam.odt_doclet.graphics.UMLDiagramGenerator;
 
@@ -146,7 +147,7 @@ public class GenerateImages {
 							ClassBindingFactory.createBinding( clazz ),
 							new FileOutputStream( "output/" + clazz.getCanonicalName() + ".png" )
 					);
-					BigDecimalDimension cmDim = BigDecimalDimension.toCentimeters( d, 300 );
+					UnitsDimension cmDim = new UnitsDimension( d, 300, Units.Centimeters );
 					System.out.println( "\t[ " + cmDim.width + " x " + cmDim.height + " ]" );
 
 					for( Class<?> subclazz: clazz.getDeclaredClasses() )
@@ -165,7 +166,7 @@ public class GenerateImages {
 								ClassBindingFactory.createBinding( clazz ),
 								new FileOutputStream( "output/" + clazz.getCanonicalName() + ".png" )
 						);
-						BigDecimalDimension cmDim = BigDecimalDimension.toCentimeters( d, 300 );
+						UnitsDimension cmDim = new UnitsDimension( d, 300, Units.Centimeters );
 						System.out.println( "\t[ " + cmDim.width + " x " + cmDim.height + " ]" );
 
 						for( Class<?> subclazz: clazz.getDeclaredClasses() )

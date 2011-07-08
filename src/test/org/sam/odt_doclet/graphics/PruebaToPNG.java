@@ -35,7 +35,6 @@ import org.sam.xml.XMLConverter;
 import org.sam.xml.XMLWriter;
 
 /**
- * 
  */
 public class PruebaToPNG {
 

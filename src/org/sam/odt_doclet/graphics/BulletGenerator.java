@@ -7,8 +7,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.sam.odt_doclet.BigDecimalDimension;
+import org.sam.odt_doclet.UnitsDimension;
 import org.sam.odt_doclet.Loader;
+import org.sam.odt_doclet.UnitsDimension.Units;
 import org.sam.pipeline.Filter;
 import org.sam.pipeline.Pump;
 import org.sam.xml.XMLWriter;
@@ -93,7 +94,7 @@ public final class BulletGenerator{
 
 				writer.addAttribute( "width", dim.getWidth() );
 				writer.addAttribute( "height",  dim.getHeight() );
-				writer.addAttribute( "viewBox", "-2.5 -2.5 21 21" ); // 16 x 16 + 3.5 de margen
+				writer.addAttribute( "viewBox", "-2.25 -2.25 20.5 20.5" ); // 16 x 16 + 4.5 de margen
 				
 				writer.openNode( "use" );
 					writer.addAttribute( "x", 0 );
@@ -132,9 +133,9 @@ public final class BulletGenerator{
 	public static void main( String... args ) throws FileNotFoundException, IOException{
 		
 		BulletGenerator generator = new BulletGenerator();
-		BigDecimalDimension cmDim = new BigDecimalDimension( "1", "1" );
-		System.out.println( "\t[ " + cmDim.width + " x " + cmDim.height + " ]" );
-		generator.setDimension( cmDim.CentimetersToPixels( 300 ) );
+		UnitsDimension dim = new UnitsDimension( "1", ".75", Units.Inches );
+		System.out.println( "\t[ " + dim.width + " x " + dim.height + " ]" );
+		generator.setDimension( dim.toPixelsDimension( 150 ) );
 
 		for( Bullet bullet: Bullet.values() ){
 			System.out.println( bullet );

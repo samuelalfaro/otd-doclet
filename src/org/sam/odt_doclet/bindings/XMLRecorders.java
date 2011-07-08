@@ -200,18 +200,18 @@ final class XMLRecorders extends Recorders{
 		 * @see org.sam.xml.Recorder#record(java.lang.Object, org.sam.xml.XMLWriter, org.sam.xml.RecordersMapper)
 		 */
 		@Override
-		public void record(FieldBinding t, XMLWriter writer, RecordersMapper mapper) throws IOException{
-			writer.openNode("Field");
-				writer.addAttribute("name", t.name);
-				writer.addAttribute("visibility", t.visibility.toChar());
-				if(Modifier.isStatic(t.modifiers))
-					writer.addAttribute("isStatic", true);
-				if(Modifier.isTransient(t.modifiers))
-					writer.addAttribute("isTransient", true);
-				if(Modifier.isVolatile(t.modifiers))
-					writer.addAttribute("isVolatile", true);
-				if(Modifier.isFinal(t.modifiers))
-					writer.addAttribute("isFinal", true);
+		public void record( FieldBinding t, XMLWriter writer, RecordersMapper mapper ) throws IOException{
+			writer.openNode( "Field" );
+				writer.addAttribute( "name", t.name );
+				writer.addAttribute( "visibility", t.visibility.toChar() );
+				if( Modifier.isStatic( t.modifiers ) )
+					writer.addAttribute( "isStatic", true );
+				if( Modifier.isTransient( t.modifiers ) )
+					writer.addAttribute( "isTransient", true );
+				if( Modifier.isVolatile( t.modifiers ) )
+					writer.addAttribute( "isVolatile", true );
+				if( Modifier.isFinal( t.modifiers ) )
+					writer.addAttribute( "isFinal", true );
 				writeNode( "Type", t.type, writer );
 				writeDocumentation( t.documentation, writer );
 				writeNode( "Links", t.links, writer, mapper );

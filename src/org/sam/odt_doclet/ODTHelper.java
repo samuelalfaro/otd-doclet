@@ -22,8 +22,6 @@
 package org.sam.odt_doclet;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-
 import org.sam.xml.XMLWriter;
 
 /**
@@ -270,6 +268,16 @@ public class ODTHelper{
 					writer.closeNode();
 				writer.closeNode();
 				
+				writer.openNode( "style:style" );
+					writer.addAttribute( "style:name", "SBullet" );
+					writer.addAttribute( "style:family", "graphic" );
+					writer.addAttribute( "style:parent-style-name", "Graphics" );
+					writer.openNode( "style:graphic-properties" );
+						writer.addAttribute( "style:vertical-pos", "bottom" );
+						writer.addAttribute( "style:vertical-rel", "text" );
+					writer.closeNode();
+				writer.closeNode();
+				
 				generateAutoStyles( writer );
 				
 			writer.closeNode();
@@ -285,8 +293,28 @@ public class ODTHelper{
 		writer.closeNode();
 	}
 	
-	public static void insertImage( XMLWriter writer, String style, String path, String name, BigDecimal width,
-			BigDecimal height, String units ) throws IOException{
+	public static void insertUnstyledImage( XMLWriter writer, String path, 
+			String x, String y, String width, String height, String units ) throws IOException{
+		
+		writer.openNode( "draw:frame" );
+			writer.addAttribute( "text:anchor-type", "as-char" );
+			if( units == null || units.length() == 0 )
+				units = "pt";
+			writer.addAttribute( "svg:x", x + units );
+			writer.addAttribute( "svg:y", y + units );
+			writer.addAttribute( "svg:width", width + units );
+			writer.addAttribute( "svg:height", height + units );
+			writer.openNode( "draw:image" );
+				writer.addAttribute( "xlink:href", path );
+				writer.addAttribute( "xlink:type", "simple" );
+				writer.addAttribute( "xlink:show", "embed" );
+				writer.addAttribute( "xlink:actuate", "onLoad" );
+			writer.closeNode();
+		writer.closeNode();
+	}
+	
+	public static void insertImage( XMLWriter writer, String style, String path, String name,
+			String width, String height, String units ) throws IOException{
 		
 		writer.openNode( "draw:frame" );
 			writer.addAttribute( "draw:style-name", ( style != null && style.length() > 0 ) ? style: "Graphics" );
@@ -294,8 +322,8 @@ public class ODTHelper{
 			writer.addAttribute( "text:anchor-type", "as-char" );
 			if( units == null || units.length() == 0 )
 				units = "pt";
-			writer.addAttribute( "svg:width", width+units );
-			writer.addAttribute( "svg:height", height+units );
+			writer.addAttribute( "svg:width", width + units );
+			writer.addAttribute( "svg:height", height + units );
 			writer.addAttribute( "draw:z-index", "0" );
 			writer.openNode( "draw:image" );
 				writer.addAttribute( "xlink:href", path );
@@ -307,6 +335,6 @@ public class ODTHelper{
 	}
 	
 	public static void insertImage( XMLWriter writer, String style, Graphic g ) throws IOException{
-		insertImage( writer, style, g.getPath(), g.getName(), g.getWidth(), g.getHeight(), "mm" );
+		insertImage( writer, style, g.getPath(), g.getName(), g.getWidth().toString(), g.getHeight().toString(), "mm" );
 	}
 }
