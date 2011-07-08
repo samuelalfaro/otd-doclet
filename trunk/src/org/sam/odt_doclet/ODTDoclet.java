@@ -42,9 +42,11 @@ import java.util.zip.ZipOutputStream;
 
 import javax.xml.transform.TransformerConfigurationException;
 
+import org.sam.odt_doclet.UnitsDimension.Units;
 import org.sam.odt_doclet.bindings.ClassBinding;
 import org.sam.odt_doclet.bindings.ClassBindingFactory;
 import org.sam.odt_doclet.bindings.Recorders;
+import org.sam.odt_doclet.graphics.BulletGenerator;
 import org.sam.odt_doclet.graphics.UMLDiagramGenerator;
 import org.sam.xml.XMLConverter;
 import org.sam.xml.XMLWriter;
@@ -207,6 +209,20 @@ public final class ODTDoclet{
 			entry = zin.getNextEntry();
 		}
 		zin.close();
+		
+		BulletGenerator bulletGenerator = new BulletGenerator();
+		
+		UnitsDimension ptDim = new UnitsDimension( "12", "12", Units.Points );
+		bulletGenerator.setDimension( ptDim.toPixelsDimension( dpi ) );
+		
+		for( BulletGenerator.Bullet bullet: BulletGenerator.Bullet.values() ){
+			String pictPath = "Pictures/" + bullet + ".png";
+			System.out.println( bullet );
+			out.putNextEntry( new ZipEntry( pictPath ) );
+				manifest.addImage( pictPath );
+				bulletGenerator.write( bullet, out );
+			out.closeEntry();
+		}
 
 		Queue<Par<ClassBinding, Graphic>> classes = new LinkedList<Par<ClassBinding, Graphic>>();
 		UMLDiagramGenerator generator = new UMLDiagramGenerator();

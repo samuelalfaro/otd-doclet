@@ -29,7 +29,9 @@ import org.htmlcleaner.TagNode;
 import org.sam.html.Cleaner;
 import org.sam.html.HTMLFormater;
 import org.sam.html.HTMLSerializer;
+import org.sam.odt_doclet.ODTHelper;
 import org.sam.odt_doclet.ODTHelper.TextStyleProperties;
+import org.sam.odt_doclet.graphics.BulletGenerator;
 import org.sam.xml.Recorder;
 import org.sam.xml.RecordersMapper;
 import org.sam.xml.XMLConverter;
@@ -187,6 +189,64 @@ final class ODTRecorders extends Recorders{
 		
 	} );
 	
+	static void writeConstantBullet( XMLWriter writer ) throws IOException{
+		ODTHelper.insertImage( writer, "SBullet", "Pictures/EnumConstant.png", null, "12", "12", "pt" );
+	}
+	
+	static void writeFieldBullet( XMLWriter writer ) throws IOException{
+		/*
+	<draw:g text:anchor-type="as-char" draw:style-name="gr1" svg:width="2.5cm" svg:height="2.5cm" draw:z-index="0">
+	<!-- <draw:frame svg:x="-0.5cm" svg:y="-0.5cm" svg:width="1.5cm" svg:height="1.5cm">
+		<draw:image xlink:href="Pictures/1000020100000040000000408D9C42A7.png"
+			xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" />
+	</draw:frame> -->
+	<draw:frame svg:x="0cm" svg:y="0cm" svg:width="1.5cm" svg:height="1.5cm">
+		<draw:image xlink:href="Pictures/1000020100000040000000403A62792F.png"
+			xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" />
+	</draw:frame>
+	<!-- <draw:frame svg:x="0.5cm" svg:y="0.5cm" svg:width="1.5cm" svg:height="1.5cm">
+		<draw:image xlink:href="Pictures/1000020100000040000000408D9C42A7.png"
+			xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" />
+	</draw:frame> -->
+</draw:g>*/
+	}
+	
+	static void writeConstructorBullet( XMLWriter writer ) throws IOException{
+		/*
+	<draw:g text:anchor-type="as-char" draw:style-name="gr1" svg:width="2.5cm" svg:height="2.5cm" draw:z-index="0">
+	<!-- <draw:frame svg:x="-0.5cm" svg:y="-0.5cm" svg:width="1.5cm" svg:height="1.5cm">
+		<draw:image xlink:href="Pictures/1000020100000040000000408D9C42A7.png"
+			xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" />
+	</draw:frame> -->
+	<draw:frame svg:x="0cm" svg:y="0cm" svg:width="1.5cm" svg:height="1.5cm">
+		<draw:image xlink:href="Pictures/1000020100000040000000403A62792F.png"
+			xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" />
+	</draw:frame>
+	<!-- <draw:frame svg:x="0.5cm" svg:y="0.5cm" svg:width="1.5cm" svg:height="1.5cm">
+		<draw:image xlink:href="Pictures/1000020100000040000000408D9C42A7.png"
+			xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" />
+	</draw:frame> -->
+</draw:g>*/
+	}
+	
+	static void writeMethodBullet( XMLWriter writer ) throws IOException{
+		/*
+	<draw:g text:anchor-type="as-char" draw:style-name="gr1" svg:width="2.5cm" svg:height="2.5cm" draw:z-index="0">
+	<!-- <draw:frame svg:x="-0.5cm" svg:y="-0.5cm" svg:width="1.5cm" svg:height="1.5cm">
+		<draw:image xlink:href="Pictures/1000020100000040000000408D9C42A7.png"
+			xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" />
+	</draw:frame> -->
+	<draw:frame svg:x="0cm" svg:y="0cm" svg:width="1.5cm" svg:height="1.5cm">
+		<draw:image xlink:href="Pictures/1000020100000040000000403A62792F.png"
+			xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" />
+	</draw:frame>
+	<!-- <draw:frame svg:x="0.5cm" svg:y="0.5cm" svg:width="1.5cm" svg:height="1.5cm">
+		<draw:image xlink:href="Pictures/1000020100000040000000408D9C42A7.png"
+			xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" />
+	</draw:frame> -->
+</draw:g>*/
+	}
+	
 	static void insertParagraph( String style, String content, XMLWriter writer ) throws IOException{
 		if( content != null && content.length() > 0 ){
 			writer.openNode( "text:p" );
@@ -249,7 +309,7 @@ final class ODTRecorders extends Recorders{
 			writer.emptyNode( "text:line-break" );
 			writer.openNode( "text:span" );
 				writer.addAttribute( "text:style-name", "AutoStyleB" );
-				writer.write( t.type + " :");
+				writer.write( t.type + ": ");
 			writer.closeNode();
 			if( t.documentation != null && t.documentation.length() > 0 ){
 				writer.emptyNode( "text:tab" );
@@ -294,6 +354,7 @@ final class ODTRecorders extends Recorders{
 		public void record( ConstantBinding t, XMLWriter writer, RecordersMapper mapper ) throws IOException{
 			writer.openNode( "text:p" );
 				writer.addAttribute( "text:style-name", "Estilo" );
+				writeConstantBullet( writer );
 				writer.openNode( "text:span" );
 					writer.addAttribute( "text:style-name", "AutoStyleB" );
 					writer.write( t.name );
@@ -352,7 +413,7 @@ final class ODTRecorders extends Recorders{
 		 * @see org.sam.xml.Recorder#record(java.lang.Object, org.sam.xml.XMLWriter, org.sam.xml.RecordersMapper)
 		 */
 		@Override
-		public void record( final ConstructorBinding t, XMLWriter writer, RecordersMapper mapper ) throws IOException{
+		public void record( ConstructorBinding t, XMLWriter writer, RecordersMapper mapper ) throws IOException{
 			writer.openNode( "text:p" );
 				writer.addAttribute( "text:style-name", "Estilo" );	
 				writer.write( t.name );
@@ -428,7 +489,7 @@ final class ODTRecorders extends Recorders{
 		 * @see org.sam.xml.Recorder#record(java.lang.Object, org.sam.xml.XMLWriter, org.sam.xml.RecordersMapper)
 		 */
 		@Override
-		public void record(ClassBinding.Interface t, XMLWriter writer, RecordersMapper mapper) throws IOException{
+		public void record( ClassBinding.Interface t, XMLWriter writer, RecordersMapper mapper ) throws IOException{
 //				writer.openNode( "Interface" );
 //					writer.addAttribute( "name", t.name );
 //					writeNode( "Documentation", FORMATER.format( t.documentation ), writer );

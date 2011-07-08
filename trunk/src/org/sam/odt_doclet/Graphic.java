@@ -24,6 +24,8 @@ package org.sam.odt_doclet;
 import java.awt.Dimension;
 import java.math.BigDecimal;
 
+import org.sam.odt_doclet.UnitsDimension.Units;
+
 /**
  * 
  */
@@ -31,12 +33,12 @@ public class Graphic{
 	
 	final String name;
 	final String path;
-	final BigDecimalDimension dimension;
+	final UnitsDimension dimension;
 	
 	Graphic( String name, String path, Dimension dimension, int dpi ){
 		this.name = name;
 		this.path = path;
-		this.dimension = BigDecimalDimension.toMilimeters( dimension, dpi );
+		this.dimension = new UnitsDimension( dimension, dpi, Units.Milimeters );
 	}
 	
 	/**
