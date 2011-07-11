@@ -22,6 +22,7 @@
 package org.sam.odt_doclet.bindings;
 
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 
 import org.htmlcleaner.ContentNode;
@@ -31,7 +32,6 @@ import org.sam.html.HTMLFormater;
 import org.sam.html.HTMLSerializer;
 import org.sam.odt_doclet.ODTHelper;
 import org.sam.odt_doclet.ODTHelper.TextStyleProperties;
-import org.sam.odt_doclet.graphics.BulletGenerator;
 import org.sam.xml.Recorder;
 import org.sam.xml.RecordersMapper;
 import org.sam.xml.XMLConverter;
@@ -193,58 +193,62 @@ final class ODTRecorders extends Recorders{
 		ODTHelper.insertImage( writer, "SBullet", "Pictures/EnumConstant.png", null, "12", "12", "pt" );
 	}
 	
-	static void writeFieldBullet( XMLWriter writer ) throws IOException{
-		/*
-	<draw:g text:anchor-type="as-char" draw:style-name="gr1" svg:width="2.5cm" svg:height="2.5cm" draw:z-index="0">
-	<!-- <draw:frame svg:x="-0.5cm" svg:y="-0.5cm" svg:width="1.5cm" svg:height="1.5cm">
-		<draw:image xlink:href="Pictures/1000020100000040000000408D9C42A7.png"
-			xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" />
-	</draw:frame> -->
-	<draw:frame svg:x="0cm" svg:y="0cm" svg:width="1.5cm" svg:height="1.5cm">
-		<draw:image xlink:href="Pictures/1000020100000040000000403A62792F.png"
-			xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" />
-	</draw:frame>
-	<!-- <draw:frame svg:x="0.5cm" svg:y="0.5cm" svg:width="1.5cm" svg:height="1.5cm">
-		<draw:image xlink:href="Pictures/1000020100000040000000408D9C42A7.png"
-			xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" />
-	</draw:frame> -->
-</draw:g>*/
+	static void writeBullet( FieldBinding f, XMLWriter writer ) throws IOException{
+		StringBuilder bulletName = new StringBuilder("Pictures/");
+		bulletName.append( f.visibility.name() );
+		if( Modifier.isStatic( f.modifiers ) )
+			bulletName.append( "Static" );
+		bulletName.append( "Field.png" );
+		
+		if( Modifier.isTransient( f.modifiers ) || Modifier.isVolatile( f.modifiers ) || Modifier.isFinal( f.modifiers ) ){
+			writer.openNode( "draw:g" );
+				writer.addAttribute( "text:anchor-type", "as-char" );
+				writer.addAttribute( "draw:style-name", "SBullet" );
+				ODTHelper.insertUnstyledImage( writer, bulletName.toString(), "0", "0", "12", "12", "pt" );
+				if( Modifier.isTransient( f.modifiers ) )
+					ODTHelper.insertUnstyledImage( writer, "Pictures/Transient.png", "0", "0", "12", "12", "pt" );
+				if( Modifier.isVolatile( f.modifiers ) )
+					ODTHelper.insertUnstyledImage( writer, "Pictures/Volatile.png", "0", "0", "12", "12", "pt" );
+				if( Modifier.isFinal( f.modifiers ) )
+					ODTHelper.insertUnstyledImage( writer, "Pictures/Final.png", "0", "0", "12", "12", "pt" );
+			writer.closeNode();
+		}else
+			ODTHelper.insertImage( writer, "SBullet", bulletName.toString(), null, "12", "12", "pt" );
 	}
 	
-	static void writeConstructorBullet( XMLWriter writer ) throws IOException{
-		/*
-	<draw:g text:anchor-type="as-char" draw:style-name="gr1" svg:width="2.5cm" svg:height="2.5cm" draw:z-index="0">
-	<!-- <draw:frame svg:x="-0.5cm" svg:y="-0.5cm" svg:width="1.5cm" svg:height="1.5cm">
-		<draw:image xlink:href="Pictures/1000020100000040000000408D9C42A7.png"
-			xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" />
-	</draw:frame> -->
-	<draw:frame svg:x="0cm" svg:y="0cm" svg:width="1.5cm" svg:height="1.5cm">
-		<draw:image xlink:href="Pictures/1000020100000040000000403A62792F.png"
-			xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" />
-	</draw:frame>
-	<!-- <draw:frame svg:x="0.5cm" svg:y="0.5cm" svg:width="1.5cm" svg:height="1.5cm">
-		<draw:image xlink:href="Pictures/1000020100000040000000408D9C42A7.png"
-			xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" />
-	</draw:frame> -->
-</draw:g>*/
+	static void writeBullet( ConstructorBinding c, XMLWriter writer ) throws IOException{
+		StringBuilder bulletName = new StringBuilder("Pictures/");
+		bulletName.append( c.visibility.name() );
+		bulletName.append( "Constructor.png" );
+		ODTHelper.insertImage( writer, "SBullet", bulletName.toString(), null, "12", "12", "pt" );
 	}
 	
-	static void writeMethodBullet( XMLWriter writer ) throws IOException{
-		/*
-	<draw:g text:anchor-type="as-char" draw:style-name="gr1" svg:width="2.5cm" svg:height="2.5cm" draw:z-index="0">
-	<!-- <draw:frame svg:x="-0.5cm" svg:y="-0.5cm" svg:width="1.5cm" svg:height="1.5cm">
-		<draw:image xlink:href="Pictures/1000020100000040000000408D9C42A7.png"
-			xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" />
-	</draw:frame> -->
-	<draw:frame svg:x="0cm" svg:y="0cm" svg:width="1.5cm" svg:height="1.5cm">
-		<draw:image xlink:href="Pictures/1000020100000040000000403A62792F.png"
-			xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" />
-	</draw:frame>
-	<!-- <draw:frame svg:x="0.5cm" svg:y="0.5cm" svg:width="1.5cm" svg:height="1.5cm">
-		<draw:image xlink:href="Pictures/1000020100000040000000408D9C42A7.png"
-			xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" />
-	</draw:frame> -->
-</draw:g>*/
+	static void writeBullet( MethodBinding m, XMLWriter writer ) throws IOException{
+		StringBuilder bulletName = new StringBuilder("Pictures/");
+		bulletName.append( m.visibility.name() );
+		if( Modifier.isStatic( m.modifiers ) )
+			bulletName.append( "Static" );
+		else if( Modifier.isAbstract( m.modifiers ) )
+			bulletName.append( "Abstract" );
+		bulletName.append( "Method.png" );
+		
+		if( Modifier.isNative( m.modifiers ) || Modifier.isStrict( m.modifiers ) 
+				|| Modifier.isFinal( m.modifiers ) || Modifier.isSynchronized( m.modifiers )){
+			writer.openNode( "draw:g" );
+				writer.addAttribute( "text:anchor-type", "as-char" );
+				writer.addAttribute( "draw:style-name", "SBullet" );
+				ODTHelper.insertUnstyledImage( writer, bulletName.toString(), "0", "0", "12", "12", "pt" );
+				if( Modifier.isNative( m.modifiers ) )
+					ODTHelper.insertUnstyledImage( writer, "Pictures/Native.png", "0", "0", "12", "12", "pt" );
+				if( Modifier.isStrict( m.modifiers ) )
+					ODTHelper.insertUnstyledImage( writer, "Pictures/Strictfp.png", "0", "0", "12", "12", "pt" );
+				if( Modifier.isFinal( m.modifiers ) )
+					ODTHelper.insertUnstyledImage( writer, "Pictures/Final.png", "0", "0", "12", "12", "pt" );
+				if( Modifier.isSynchronized( m.modifiers ) )
+					ODTHelper.insertUnstyledImage( writer, "Pictures/Synchronized.png", "0", "0", "12", "12", "pt" );
+			writer.closeNode();
+		}else
+			ODTHelper.insertImage( writer, "SBullet", bulletName.toString(), null, "12", "12", "pt" );
 	}
 	
 	static void insertParagraph( String style, String content, XMLWriter writer ) throws IOException{
@@ -256,22 +260,28 @@ final class ODTRecorders extends Recorders{
 		}
 	}
 	
-	static <T> void write( String title, Collection<T> collection, XMLWriter writer, RecordersMapper mapper ) throws IOException{
+	static void writeTitle( String title, String styleTitle, int level, XMLWriter writer ) throws IOException{
+		writer.openNode( "text:p" );
+			writer.addAttribute( "text:style-name", styleTitle );
+			writer.addAttribute( "text:outline-level", level );
+			writer.write( title );
+		writer.closeNode();
+	}
+	
+	
+	static <T> void writeCollection( String title, String styleTitle, int level, Collection<T> collection, XMLWriter writer, RecordersMapper mapper ) throws IOException{
 		if( collection != null && collection.size() > 0 ){
-			writer.openNode( "text:p" );
-				writer.addAttribute( "text:style-name", "Estilo" );
-				writer.write( title );
-			writer.closeNode();
+			writeTitle( title, styleTitle, level, writer );
 			for( T t: collection )
 				mapper.getRecorder( t.getClass() ).record( t, writer, mapper );
 		}
 	}
 	
-	static <T> void writeParagraph( String title, Collection<T> collection, XMLWriter writer, RecordersMapper mapper ) throws IOException{
+	static <T> void writeCollection( String title, String styleTitle, int level, Collection<T> collection, String styleCollection, XMLWriter writer, RecordersMapper mapper ) throws IOException{
 		if( collection != null && collection.size() > 0 ){
+			writeTitle( title, styleTitle, level, writer );
 			writer.openNode( "text:p" );
-				writer.addAttribute( "text:style-name", "Estilo" );
-				writer.write( title );
+				writer.addAttribute( "text:style-name", styleCollection );
 				for( T t: collection )
 					mapper.getRecorder( t.getClass() ).record( t, writer, mapper );
 			writer.closeUntilParent("text:p");
@@ -353,18 +363,21 @@ final class ODTRecorders extends Recorders{
 		@Override
 		public void record( ConstantBinding t, XMLWriter writer, RecordersMapper mapper ) throws IOException{
 			writer.openNode( "text:p" );
-				writer.addAttribute( "text:style-name", "Estilo" );
+				writer.addAttribute( "text:style-name", "Heading_20_3" );
+				writer.addAttribute( "text:outline-level", 3 );
 				writeConstantBullet( writer );
 				writer.openNode( "text:span" );
 					writer.addAttribute( "text:style-name", "AutoStyleB" );
 					writer.write( t.name );
 				writer.closeNode();
-				if( t.documentation != null && t.documentation.length() > 0 ){
-					writer.emptyNode( "text:tab" );
+			writer.closeNode();
+			if( t.documentation != null && t.documentation.length() > 0 ){
+				writer.openNode( "text:p" );
+					writer.addAttribute( "text:style-name", "Standard" );
 					FORMATER.format( t.documentation, writer );
-				}
-			writer.closeUntilParent("text:p");
-			writeParagraph( "Mire También:", t.links, writer, mapper );
+				writer.closeUntilParent("text:p");
+			}
+			writeCollection( "Mire También:", "Heading_20_4", 4, t.links, "Standard", writer, mapper );
 		}
 	}
 
@@ -377,31 +390,24 @@ final class ODTRecorders extends Recorders{
 		 */
 		@Override
 		public void record( FieldBinding t, XMLWriter writer, RecordersMapper mapper ) throws IOException{
-			
-//				writer.addAttribute("visibility", t.visibility.toChar());
-//				if(Modifier.isStatic(t.modifiers))
-//					writer.addAttribute("isStatic", true);
-//				if(Modifier.isTransient(t.modifiers))
-//					writer.addAttribute("isTransient", true);
-//				if(Modifier.isVolatile(t.modifiers))
-//					writer.addAttribute("isVolatile", true);
-//				if(Modifier.isFinal(t.modifiers))
-//					writer.addAttribute("isFinal", true);
-			
 			writer.openNode( "text:p" );
-				writer.addAttribute( "text:style-name", "Estilo" );
+			writer.addAttribute( "text:style-name", "Heading_20_3" );
+				writer.addAttribute( "text:outline-level", 3 );
+				writeBullet( t, writer );
 				writer.openNode( "text:span" );
 					writer.addAttribute( "text:style-name", "AutoStyleB" );
 					writer.write( t.name );
 					writer.write( ": " );
 					writer.write( t.type );
 				writer.closeNode();
-				if( t.documentation != null && t.documentation.length() > 0 ){
-					writer.emptyNode( "text:tab" );
+			writer.closeNode();
+			if( t.documentation != null && t.documentation.length() > 0 ){
+				writer.openNode( "text:p" );
+					writer.addAttribute( "text:style-name", "Standard" );
 					FORMATER.format( t.documentation, writer );
-				}
-			writer.closeUntilParent("text:p");
-			writeParagraph( "Mire También:", t.links, writer, mapper );
+				writer.closeUntilParent("text:p");
+			}
+			writeCollection( "Mire También:", "Heading_20_4", 4, t.links, "Standard", writer, mapper );
 		}
 	}
 
@@ -415,19 +421,16 @@ final class ODTRecorders extends Recorders{
 		@Override
 		public void record( ConstructorBinding t, XMLWriter writer, RecordersMapper mapper ) throws IOException{
 			writer.openNode( "text:p" );
-				writer.addAttribute( "text:style-name", "Estilo" );	
+				writer.addAttribute( "text:style-name", "Heading_20_3" );
+				writer.addAttribute( "text:outline-level", 3 );
+				writeBullet( t, writer );
 				writer.write( t.name );
 			writer.closeNode();
 			insertParagraph( "Estilo", t.documentation, writer );
-//				writer.openNode("Constructor");
-//					writer.addAttribute("name", t.name);
-//					writer.addAttribute("visibility", t.visibility.toChar());
-//					writeNode( "Documentation", FORMATER.format( t.documentation ), writer );
-//					writeNode( "TypeParameters", t.typeParams, writer, mapper );
-//					writeNode( "Parameters", t.params, writer, mapper );
-//					writeNode( "Exceptions", t.exceptions, writer, mapper );
-//					writeNode( "Links", t.links, writer, mapper );
-//				writer.closeNode();
+			writeCollection( "Tipos Parametizados:", "Heading_20_4", 4, t.typeParams, "Standard", writer, mapper );
+			writeCollection( "Parámetros:", "Heading_20_4", 4, t.params, "Standard", writer, mapper );
+			writeCollection( "Lanza:", "Heading_20_4", 4, t.exceptions, "Standard", writer, mapper );
+			writeCollection( "Mire También:", "Heading_20_4", 4, t.links, "Standard", writer, mapper );
 		}
 	}
 
@@ -441,43 +444,27 @@ final class ODTRecorders extends Recorders{
 		@Override
 		public void record( MethodBinding t, XMLWriter writer, RecordersMapper mapper ) throws IOException{
 			writer.openNode( "text:p" );
-				writer.addAttribute( "text:style-name", "Estilo" );	
+				writer.addAttribute( "text:style-name", "Heading_20_3" );
+				writer.addAttribute( "text:outline-level", 3 );
+				writeBullet( t, writer );
 				writer.write( t.name );
 			writer.closeNode();
 			insertParagraph( "Estilo", t.documentation, writer );
-			writeParagraph( "Tipos Parametizados:", t.typeParams, writer, mapper );
-			writeParagraph( "Parámetros:", t.params, writer, mapper );
+			writeCollection( "Tipos Parametizados:", "Heading_20_4", 4, t.typeParams, "Standard", writer, mapper );
+			writeCollection( "Parámetros:", "Heading_20_4", 4, t.params, "Standard", writer, mapper );
 			if( t.returnType != null ){
 				writer.openNode( "text:p" );
-					writer.addAttribute( "text:style-name", "Estilo" );	
+					writer.addAttribute( "text:style-name", "Heading_20_4" );
+					writer.addAttribute( "text:outline-level", 4 );
 					writer.write( "Devuelve:" );
+				writer.closeNode();
+				writer.openNode( "text:p" );
+					writer.addAttribute( "text:style-name", "Standard" );
 					mapper.getRecorder( ReturnTypeBinding.class ).record( t.returnType, writer, mapper );
-				writer.closeUntilParent("text:p");
+				writer.closeUntilParent( "text:p" );
 			}
-			writeParagraph( "Mire También:", t.links, writer, mapper );
-//				writer.openNode("Method");
-//					writer.addAttribute("name", t.name);
-//					writer.addAttribute("visibility", t.visibility.toChar());
-//					if(Modifier.isStatic(t.modifiers))
-//						writer.addAttribute("isStatic", true);
-//					if(Modifier.isAbstract(t.modifiers))
-//						writer.addAttribute("isAbstract", true);
-//					if(Modifier.isNative(t.modifiers))
-//						writer.addAttribute("isNative", true);
-//					if(Modifier.isStrict(t.modifiers))
-//						writer.addAttribute("isStrictfp", true);
-//					if(Modifier.isFinal(t.modifiers))
-//						writer.addAttribute("isFinal", true);
-//					if(Modifier.isSynchronized(t.modifiers))
-//						writer.addAttribute("isSynchronized", true);
-//					writeNode( "Documentation", FORMATER.format( t.documentation ), writer );
-//					writeNode( "TypeParameters", t.typeParams, writer, mapper );
-//					writeNode( "Parameters", t.params, writer, mapper );
-//					if(t.returnType != null)
-//						mapper.getRecorder( ReturnTypeBinding.class ).record(t.returnType, writer, mapper );
-//					writeNode( "Exceptions", t.exceptions, writer, mapper );
-//					writeNode( "Links", t.links, writer, mapper );
-//				writer.closeNode();
+			writeCollection( "Lanza:", "Heading_20_4", 4, t.exceptions, "Standard", writer, mapper );
+			writeCollection( "Mire También:", "Heading_20_4", 4, t.links, "Standard", writer, mapper );
 		}
 	}
 
@@ -490,93 +477,67 @@ final class ODTRecorders extends Recorders{
 		 */
 		@Override
 		public void record( ClassBinding.Interface t, XMLWriter writer, RecordersMapper mapper ) throws IOException{
-//				writer.openNode( "Interface" );
-//					writer.addAttribute( "name", t.name );
-//					writeNode( "Documentation", FORMATER.format( t.documentation ), writer );
-//					writeNode( "TypeParameters", t.parameters, writer, mapper );
-//					writeNode( "Links", t.links, writer, mapper );
-//					
-//					writeNode( "EnclosingClasses", t.enclosingClasses, writer, mapper );
-//					writeNode( "Interfaces", t.interfaces, writer, mapper );
-//					writeNode( "Fields", t.fields, writer, mapper );
-//					writeNode( "Methods", t.methods, writer, mapper );
-//				writer.closeNode();
 			writer.openNode( "text:p" );
-				writer.addAttribute( "text:style-name", "Estilo" );	
+				writer.addAttribute( "text:style-name", "Heading_20_1" );
+				writer.addAttribute( "text:outline-level", 1 );
 				writer.write( "Interface: " + t.name );
 			writer.closeNode();
-			insertParagraph( "Estilo", t.documentation, writer );
-			writeParagraph( "Mire También:", t.links, writer, mapper );
+			writeCollection( "Parámetros:", "Heading_20_4", 4, t.parameters, "Standard", writer, mapper );
+			insertParagraph( "Standard", t.documentation, writer );
+			writeCollection( "Mire También:", "Heading_20_4", 4, t.links, "Standard", writer, mapper );
+			writeCollection( "Atributos:", "Heading_20_2", 2, t.fields, writer, mapper );
+			writeCollection( "Métodos:", "Heading_20_2", 2, t.methods, writer, mapper );
 		}
 	}
 
 	private static class EnumRecorder implements Recorder<ClassBinding.Enum>{
-		
-		EnumRecorder(){}
-		
-		/* (non-Javadoc)
+
+		EnumRecorder(){
+		}
+
+		/*
+		 * (non-Javadoc)
 		 * @see org.sam.xml.Recorder#record(java.lang.Object, org.sam.xml.XMLWriter, org.sam.xml.RecordersMapper)
 		 */
 		@Override
 		public void record( ClassBinding.Enum t, XMLWriter writer, RecordersMapper mapper ) throws IOException{
-//				writer.openNode( "Enum" );
-//					writer.addAttribute( "name", t.name );
-//					writeNode( "Documentation", FORMATER.format( t.documentation ), writer );
-//					writeNode( "Links", t.links, writer, mapper );
-//					
-//					writeNode( "EnclosingClasses", t.enclosingClasses, writer, mapper );
-//					writeNode( "Interfaces", t.interfaces, writer, mapper );
-			
-//					writeNode( "Constants", t.constants, writer, mapper );
-//					writeNode( "Fields", t.fields, writer, mapper );
-//					writeNode( "Methods", t.methods, writer, mapper );
-//				writer.closeNode();
 			writer.openNode( "text:p" );
-				writer.addAttribute( "text:style-name", "Estilo" );	
-				writer.write( "Enum: " + t.name );
+				writer.addAttribute( "text:style-name", "Heading_20_1" );
+				writer.addAttribute( "text:outline-level", 1 );
+				writer.write( "Enumeración: " + t.name );
 			writer.closeNode();
-			insertParagraph( "Estilo", t.documentation, writer );
-			writeParagraph( "Mire También:", t.links, writer, mapper );
-			write( "Elementos:", t.constants, writer, mapper );
-			write( "Atributos:", t.fields, writer, mapper );
-			write( "Constructores:", t.constructors, writer, mapper );
-			write( "Métodos:", t.methods, writer, mapper );
+
+			insertParagraph( "Standard", t.documentation, writer );
+			writeCollection( "Mire También:", "Heading_20_4", 4, t.links, "Standard", writer, mapper );
+			writeCollection( "Constantes:", "Heading_20_2", 2, t.constants, writer, mapper );
+			writeCollection( "Atributos:", "Heading_20_2", 2, t.fields, writer, mapper );
+			writeCollection( "Constructores:", "Heading_20_2", 2, t.constructors, writer, mapper );
+			writeCollection( "Métodos:", "Heading_20_2", 2, t.methods, writer, mapper );
 		}
 	}
 
 	private static class ClassRecorder implements Recorder<ClassBinding.Clazz>{
-		
-		ClassRecorder(){}
-		
-		/* (non-Javadoc)
+
+		ClassRecorder(){
+		}
+
+		/*
+		 * (non-Javadoc)
 		 * @see org.sam.xml.Recorder#record(java.lang.Object, org.sam.xml.XMLWriter, org.sam.xml.RecordersMapper)
 		 */
 		@Override
 		public void record( ClassBinding.Clazz t, XMLWriter writer, RecordersMapper mapper ) throws IOException{
-//				writer.openNode( "Class" );
-//					writer.addAttribute( "name", t.name );
-//					if(t.isAbstract)
-//						writer.addAttribute( "isAbstract", t.isAbstract );
-//					writeNode( "Documentation", FORMATER.format( t.documentation ), writer );
-//					writeNode( "TypeParameters", t.parameters, writer, mapper );
-//					writeNode( "Links", t.links, writer, mapper );
-//					
-//					writeNode( "Hierarchy", t.hierarchy, writer, mapper );
-//					writeNode( "EnclosingClasses", t.enclosingClasses, writer, mapper );
-//					writeNode( "Interfaces", t.interfaces, writer, mapper );
-//					writeNode( "Fields", t.fields, writer, mapper );
-//					writeNode( "Constructors", t.constructors, writer, mapper );
-//					writeNode( "Methods", t.methods, writer, mapper );
-//				writer.closeNode();
 			writer.openNode( "text:p" );
-				writer.addAttribute( "text:style-name", "Estilo" );	
+				writer.addAttribute( "text:style-name", "Heading_20_1" );
+				writer.addAttribute( "text:outline-level", 1 );
 				writer.write( "Clase: " + t.name );
 			writer.closeNode();
-			insertParagraph( "Estilo", t.documentation, writer );
-			writeParagraph( "Mire También:", t.links, writer, mapper );
-			write( "Atributos:", t.fields, writer, mapper );
-			write( "Constructores:", t.constructors, writer, mapper );
-			write( "Métodos:", t.methods, writer, mapper );
+			writeCollection( "Parámetros:", "Heading_20_4", 4, t.parameters, "Standard", writer, mapper );
+			insertParagraph( "Standard", t.documentation, writer );
+			writeCollection( "Mire También:", "Heading_20_4", 4, t.links, "Standard", writer, mapper );
+			writeCollection( "Atributos:", "Heading_20_2", 2, t.fields, writer, mapper );
+			writeCollection( "Constructores:", "Heading_20_2", 2, t.constructors, writer, mapper );
+			writeCollection( "Métodos:", "Heading_20_2", 2, t.methods, writer, mapper );
 		}
 	}
 	
