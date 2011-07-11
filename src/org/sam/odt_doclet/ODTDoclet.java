@@ -220,7 +220,7 @@ public final class ODTDoclet{
 			System.out.println( bullet );
 			out.putNextEntry( new ZipEntry( pictPath ) );
 				manifest.addImage( pictPath );
-				bulletGenerator.write( bullet, out );
+				bulletGenerator.toPNG( bullet, out );
 			out.closeEntry();
 		}
 

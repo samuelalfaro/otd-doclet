@@ -2,14 +2,10 @@ package org.sam.odt_doclet.graphics;
 
 import java.awt.Dimension;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.sam.odt_doclet.UnitsDimension;
 import org.sam.odt_doclet.Loader;
-import org.sam.odt_doclet.UnitsDimension.Units;
 import org.sam.pipeline.Filter;
 import org.sam.pipeline.Pump;
 import org.sam.xml.XMLWriter;
@@ -125,21 +121,8 @@ public final class BulletGenerator{
 	 * @return
 	 * @throws IOException
 	 */
-	public void write( Bullet bullet, OutputStream out ) throws IOException{
+	public void toPNG( Bullet bullet, OutputStream out ) throws IOException{
 		processor.setSource( bullet );
 		SVGtoPNG.process( out );
-	}
-	
-	public static void main( String... args ) throws FileNotFoundException, IOException{
-		
-		BulletGenerator generator = new BulletGenerator();
-		UnitsDimension dim = new UnitsDimension( "1", ".75", Units.Inches );
-		System.out.println( "\t[ " + dim.width + " x " + dim.height + " ]" );
-		generator.setDimension( dim.toPixelsDimension( 150 ) );
-
-		for( Bullet bullet: Bullet.values() ){
-			System.out.println( bullet );
-			generator.write( bullet, new FileOutputStream( "output/" + bullet + ".png" ) );
-		}
 	}
 }
