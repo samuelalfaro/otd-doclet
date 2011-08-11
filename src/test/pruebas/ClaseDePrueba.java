@@ -34,15 +34,16 @@ class Float{
 
 /**
  * Documentacion de la clase ClaseDePrueba.
+ * @param <E> Tipo paramético E.
  */
 public class ClaseDePrueba<E> {
 	
 	/**
-	 *  Documentacion de la clase InerClassAbs.
+	 * Documentacion de la clase InerClassAbs.
 	 */
 	private static abstract class InerClassAbs{
 		/**
-		 *  Documentacion de la clase InerInerClass.
+		 * Documentacion de la clase InerInerClass.
 		 */
 		private static class InerInerClass {
 			
@@ -55,10 +56,8 @@ public class ClaseDePrueba<E> {
 		abstract void metodo1(int a);
 		
 		/**
-		
 		 * @param t1
 		 * @param t2
-		
 		 * @return bla bla bla bla */
 		abstract <T> T metodo2(T t1, T t2);
 	}

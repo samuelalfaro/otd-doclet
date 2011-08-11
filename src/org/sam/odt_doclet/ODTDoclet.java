@@ -130,54 +130,6 @@ public final class ODTDoclet{
 		}
 	}
 
-	/*
-	private static class ContentGenerator{
-
-		private static String readTemplate( InputStream in ) throws IOException{
-			StringBuffer template = new StringBuffer();
-			byte[] buf = new byte[4096];
-			int len;
-			while( ( len = in.read( buf ) ) > 0 ){
-				template.append( new String( buf, 0, len, UTF8 ) );
-			}
-			return template.toString();
-		}
-
-		private final String template;
-		private final VelocityContext context;
-		private final Collection<Graphic> graphics;
-
-		ContentGenerator() throws IOException{
-			Velocity.init();
-			template = readTemplate( Loader.getResourceAsStream( "/resources/toODT.vm" ) );
-			context = new VelocityContext();
-			graphics = new LinkedList<Graphic>();
-			context.put( "graphics", graphics );
-		}
-
-		void addGraphic( String name, String path, Dimension dim, int dpi ){
-			graphics.add( new Graphic( name, path, dim, dpi ) );
-		}
-
-		byte[] getBytes(){
-			StringWriter writer = new StringWriter();
-			Velocity.evaluate( context, writer, "toODT.vm", template );
-			return writer.getBuffer().toString().getBytes( UTF8 );
-		}
-	}
-	*/
-	
-	private static class Par <U, V>{
-		
-		final U u;
-		final V v;
-		
-		Par(U u, V v){
-			this.u = u;
-			this.v = v;
-		}
-	}
-	
 	/**
 	 * @param plantilla
 	 * @param resultFile
@@ -212,7 +164,7 @@ public final class ODTDoclet{
 		
 		BulletGenerator bulletGenerator = new BulletGenerator();
 		
-		UnitsDimension ptDim = new UnitsDimension( "12", "12", Units.Points );
+		UnitsDimension ptDim = new UnitsDimension( "14", "14", Units.Points );
 		bulletGenerator.setDimension( ptDim.toPixelsDimension( dpi ) );
 		
 		for( BulletGenerator.Bullet bullet: BulletGenerator.Bullet.values() ){
@@ -224,7 +176,7 @@ public final class ODTDoclet{
 			out.closeEntry();
 		}
 
-		Queue<Par<ClassBinding, Graphic>> classes = new LinkedList<Par<ClassBinding, Graphic>>();
+		Queue<ClassBinding> classes = new LinkedList<ClassBinding>();
 		UMLDiagramGenerator generator = new UMLDiagramGenerator();
 		generator.setScale( scaleFactor );
 		
@@ -239,7 +191,9 @@ public final class ODTDoclet{
 					manifest.addImage( pictPath );
 					Dimension dim = generator.toPNG( clazz, out );
 				out.closeEntry();
-				classes.offer( new Par<ClassBinding, Graphic>( clazz, new Graphic( pictName, pictPath, dim, dpi ) ) );
+				
+				clazz.setGraphic( new Graphic( pictName, pictPath, dim, dpi ) );
+				classes.offer( clazz );
 			}catch( ClassNotFoundException e ){
 				e.printStackTrace();
 			}
@@ -253,13 +207,9 @@ public final class ODTDoclet{
 		converter.setWriter( writer );
 		
 		ODTHelper.beginDocumenContent( writer );
-		for( Par<ClassBinding, Graphic> clazz: classes ){
-			writer.openNode( "text:p" );
-				writer.addAttribute( "text:style-name", "Estilo" );	
-				ODTHelper.insertImage( writer, "", clazz.v );
-			writer.closeNode();
-			converter.write( clazz.u );
-		}
+		for( ClassBinding clazz: classes )
+			converter.write( clazz );
+
 		ODTHelper.endDocumenContent( writer );
 
 		out.putNextEntry( new ZipEntry( "META-INF/manifest.xml" ) );

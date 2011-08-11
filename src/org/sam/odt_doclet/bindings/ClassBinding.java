@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 
+import org.sam.odt_doclet.Graphic;
 
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.ConstructorDoc;
@@ -1165,6 +1166,8 @@ public abstract class ClassBinding extends DocumentedElement{
 		}
 	}
 	
+	Graphic graphic;
+	
 	Collection<SimpleClassBinding> enclosingClasses;
 	Collection<SimpleClassBinding> interfaces;
 	
@@ -1178,5 +1181,9 @@ public abstract class ClassBinding extends DocumentedElement{
 	 */
 	ClassBinding( Class<?> clazz, ClassDoc classDoc ){
 		super( Adapter.toString( clazz ), classDoc );
+	}
+	
+	public void setGraphic( Graphic graphic ){
+		this.graphic = graphic;
 	}
 }
