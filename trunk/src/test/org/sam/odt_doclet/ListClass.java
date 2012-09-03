@@ -21,6 +21,7 @@
  */
 package org.sam.odt_doclet;
 
+import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -44,44 +45,46 @@ public class ListClass {
 		}
 	};
 	
-	private static final Comparator<ClassDoc> COMPARADOR_POR_NOMBRE = new Comparator<ClassDoc>() {
+	private static final Comparator<ClassDoc> COMPARADOR_POR_NOMBRE = new Comparator<ClassDoc>(){
 		/** {@inheritDoc} */
-		public int compare(ClassDoc e1, ClassDoc e2) {
-			return e1.name().compareTo(e2.name());
+		public int compare( ClassDoc e1, ClassDoc e2 ){
+			return e1.name().compareTo( e2.name() );
 		}
 	};
 	
 	private static final Comparator<ClassDoc> COMPARADOR_DE_CLASES = new Comparator<ClassDoc>() {
 		
-		private String getHierarchicalName(ClassDoc classDoc){
+		private String getHierarchicalName( ClassDoc classDoc ){
 			String name = classDoc.simpleTypeName();
 			ClassDoc containingClass = classDoc.containingClass();
-			while(containingClass != null){
-				if(containingClass.containingClass() != null)
+			while( containingClass != null ){
+				if( containingClass.containingClass() != null )
 					name = containingClass.simpleTypeName() + "." + classDoc.simpleTypeName();
 				else
-					name = getHierarchicalName(containingClass) + "." + name;
+					name = getHierarchicalName( containingClass ) + "." + name;
 				containingClass = containingClass.containingClass();
 			}
 			ClassDoc superClassDoc = classDoc.superclass();
-			if( superClassDoc != null && 
-					classDoc.containingPackage().name().equals(superClassDoc.containingPackage().name())){
-				name = getHierarchicalName(superClassDoc) + "/" + name;
+			if( superClassDoc != null
+					&& classDoc.containingPackage().name().equals( superClassDoc.containingPackage().name() ) ){
+				name = getHierarchicalName( superClassDoc ) + "/" + name;
 			}
 			return name;
 		}
 		
 		/** {@inheritDoc} */
-		public int compare(ClassDoc e1, ClassDoc e2) {
-			return getHierarchicalName(e1).compareTo(getHierarchicalName(e2));
+		public int compare( ClassDoc e1, ClassDoc e2 ){
+			return getHierarchicalName( e1 ).compareTo( getHierarchicalName( e2 ) );
 		}
 	};
 	
-	private static void print(String title, Collection<ClassDoc> collection){
-		if(collection.size() > 0){
-			System.err.println(title);
-			for(ClassDoc classDoc: collection)
-				System.err.println("\t"+classDoc.name());
+	private static final PrintStream OUT = System.out;
+	
+	private static void print( String title, Collection<ClassDoc> collection ){
+		if( collection.size() > 0 ){
+			OUT.println( title );
+			for( ClassDoc classDoc: collection )
+				OUT.println( "\t" + classDoc.name() );
 		}
 	}
 	
@@ -95,14 +98,14 @@ public class ListClass {
 		ClassDoc[] classes = root.classes();
 		for(ClassDoc classDoc: classes){
 			if(classDoc.containingPackage().name().equals(""))
-				System.err.println("\t"+classDoc.name());
+				OUT.println("\t"+classDoc.name());
 		}
 
 		SortedSet<PackageDoc> sortedPackages = new TreeSet<PackageDoc>(COMPARADOR_DE_PACKAGES);
 		sortedPackages.addAll( Arrays.asList(root.specifiedPackages()) );
 
 		for(PackageDoc packageDoc: sortedPackages){
-			System.err.println(packageDoc+"\n");
+			OUT.println(packageDoc+"\n");
 			SortedSet<ClassDoc> sortedInterfaces = new TreeSet<ClassDoc>(COMPARADOR_POR_NOMBRE);
 			SortedSet<ClassDoc> sortedClasses    = new TreeSet<ClassDoc>(COMPARADOR_DE_CLASES);
 			SortedSet<ClassDoc> sortedException  = new TreeSet<ClassDoc>(COMPARADOR_POR_NOMBRE);
@@ -116,40 +119,40 @@ public class ListClass {
 			print("Interfaces:", sortedInterfaces);
 			print("Exceptions:", sortedException);
 			
-			if(sortedClasses.size() > 0){
-				System.err.println("Classes:");
-				for(ClassDoc classDoc: sortedClasses){
+			if( sortedClasses.size() > 0 ){
+				OUT.println( "Classes:" );
+				for( ClassDoc classDoc: sortedClasses ){
 					
-					if(classDoc.superclass().qualifiedName().equals("java.lang.Enum")){
+					if( classDoc.superclass().qualifiedName().equals( "java.lang.Enum" ) ){
 						ClassDoc containingClass = classDoc.containingClass();
-						while(containingClass  != null){
-							System.err.print('\t');
+						while( containingClass != null ){
+							OUT.print( '\t' );
 							containingClass = containingClass.containingClass();
 						}
-						System.err.println("\t"+classDoc.name());
-//						System.err.println(classDoc.isEnum());
-//						System.err.println(classDoc.isEnumConstant());
-//						System.err.println(classDoc.getRawCommentText());
-//						System.err.println(classDoc.enumConstants().length);
+						OUT.println( "\t" + classDoc.name() );
+//						OUT.println(classDoc.isEnum());
+//						OUT.println(classDoc.isEnumConstant());
+//						OUT.println(classDoc.getRawCommentText());
+//						OUT.println(classDoc.enumConstants().length);
 						
-						for(FieldDoc field: classDoc.fields(true))
+						for( FieldDoc field: classDoc.fields( true ) )
 							if(!field.type().isPrimitive() && field.type().asClassDoc().superclass() != null && field.type().asClassDoc().superclass().qualifiedName().equals("java.lang.Enum")){
-								System.err.println("\t<<Constant>>" +field.name());
+								OUT.println("\t<<Constant>>" +field.name());
 							}else
-								System.err.println("\t"+field.type()+ " " +field.name());
+								OUT.println("\t"+field.type()+ " " +field.name());
 					}
-//					System.err.println("\t"+classDoc.name());
+//					OUT.println("\t"+classDoc.name());
 //					for(FieldDoc field: classDoc.fields(true))
-//						System.err.println("\t"+field.name());
+//						OUT.println("\t"+field.name());
 //					for(ConstructorDoc constructor: classDoc.constructors(true))
-//						System.err.println("\t"+constructor.name());
+//						OUT.println("\t"+constructor.name());
 //					for(MethodDoc method: classDoc.methods(true))
-//						System.err.println("\t"+method.name());
+//						OUT.println("\t"+method.name());
 					
 				}
 			}
 			print("Enumerations:", sortedEnums);
-			System.err.println();
+			OUT.println();
 		}
 
 		return true;
