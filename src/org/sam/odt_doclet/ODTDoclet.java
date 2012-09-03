@@ -1,5 +1,5 @@
 /* 
- * ODFDoclet.java
+ * ODTDoclet.java
  * 
  * Copyright (c) 2011 Samuel Alfaro Jiménez <samuelalfaro at gmail dot com>.
  * All rights reserved.
@@ -54,10 +54,11 @@ import org.sam.xml.XMLWriter;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.DocErrorReporter;
 import com.sun.javadoc.RootDoc;
+import com.sun.tools.doclets.standard.Standard;
 
 /**
  */
-public final class ODTDoclet{
+public final class ODTDoclet extends Standard{
 
 	static final Charset UTF8 = Charset.forName( "UTF-8" );
 	static final int dpi = 300;
@@ -234,7 +235,7 @@ public final class ODTDoclet{
 	 * @return boolean
 	 */
 	public static boolean validOptions( String options[][], DocErrorReporter reporter ){
-		return DocletValidator.validOptions( options, reporter );
+		return DocletValidator.validOptions( options, reporter ) || Standard.validOptions( options, reporter );
 	}
 
 	/**
@@ -243,6 +244,7 @@ public final class ODTDoclet{
 	 * @return boolean
 	 */
 	public static boolean start( RootDoc root ){
+		System.out.println("Generando documentanción...");
 		try{
 			File fileOutput = new File( "output/result.odt" );
 			generarODT( Loader.getResourceAsStream( "resources/plantilla.odt" ), fileOutput, root );
