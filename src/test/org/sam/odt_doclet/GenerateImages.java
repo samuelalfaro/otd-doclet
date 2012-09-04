@@ -69,6 +69,8 @@ public class GenerateImages {
 		listadoPackages.add( root );
 		while( !directorios.isEmpty() ){
 			File directorioActual = directorios.poll();
+			System.out.println( directorioActual );
+			//System.out.println( directorioActual.listFiles() );
 			for( File archivo: directorioActual.listFiles() )
 				if( !archivo.isHidden() && archivo.isDirectory() ){
 					directorios.add( archivo );
@@ -121,12 +123,12 @@ public class GenerateImages {
 	 */
 	public static void main( String[] args ) throws IOException, TransformerConfigurationException{
 
-		File root = new File( "/media/DATA/Samuel/Proyectos/jspacewars/bin" );
+		File root = new File( "/data/Samuel/Proyectos/jspacewars/bin" );
 		String rootPath = root.getCanonicalPath();
 
 		ClassLoader classLoader = ClassLoaderTools.getLoader(
-				"/media/DATA/Samuel/Proyectos/jspacewars/bin",
-				"/media/DATA/Samuel/Proyectos/jspacewars/lib"
+				"/data/Samuel/Proyectos/jspacewars/bin",
+				"/data/Samuel/Proyectos/jspacewars/lib"
 		);
 	
 		SortedSet<Class<?>> packageInterfacesSet = new TreeSet<Class<?>>( COMPARADOR_DE_INTERFACES );

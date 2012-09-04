@@ -37,8 +37,10 @@ import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.sam.odt_doclet.Graphic;
 
@@ -137,7 +139,7 @@ final class Utils{
 		 */
 		@Override
 		public boolean validate(T doc) {
-			// Comparamos la posicion pues el metodo isSynthetic() devuevle siempre ¿ false ?
+			//FIXME Comparamos la posicion pues el metodo isSynthetic() devuevle siempre ¿ false ? 
 			SourcePosition docPosition = doc.position();
 			return docPosition != null && ( docPosition.line() != classPosition.line() || docPosition.column() != classPosition.column());
 		}
@@ -150,7 +152,7 @@ final class Utils{
 		taglets.put( "@value", new Taglet(){
 			@Override
 			public void apply( String text, StringBuilder builder ){
-				//FIXME obtener valor mediante reflexion.
+				//TODO obtener valor mediante reflexion.
 				builder.append( "{ En proceso: Valor de " );
 				builder.append( text );
 				builder.append( "!! }" );
@@ -187,21 +189,21 @@ final class Utils{
 
 	private static final Filter<Field> FieldsFilter = new Filter<Field>(){
 		@Override
-		public boolean validate(Field field) {
+		public boolean validate( Field field ){
 			return !field.isSynthetic() && !field.isEnumConstant();
 		}
 	};
 
 	private static final Filter<Constructor<?>> ConstructorsFilter = new Filter<Constructor<?>>(){
 		@Override
-		public boolean validate(Constructor<?> constructor) {
+		public boolean validate( Constructor<?> constructor ){
 			return !constructor.isSynthetic();
 		}
 	};
 
 	private static final Filter<Method> MethodsFilter = new Filter<Method>(){
 		@Override
-		public boolean validate(Method method) {
+		public boolean validate( Method method ){
 			return !method.isSynthetic();
 		}
 	};
@@ -211,36 +213,36 @@ final class Utils{
 		public boolean validate(Method method) {
 			String methodString = Adapter.toString( method );
 			return	!method.isSynthetic()
-					&& !methodString.startsWith("valueOf(java.lang.String)")
-					&& !methodString.startsWith("values()");
+					&& !methodString.startsWith( "valueOf(java.lang.String)" )
+					&& !methodString.startsWith( "values()" );
 		
 		}
 	};
 
 	private static final DocFilter<MethodDoc> EnumMethodsDocFilter = new DocFilter<MethodDoc>(){
 		@Override
-		public boolean validate(MethodDoc method) {
-			if( super.validate(method) ){
+		public boolean validate( MethodDoc method ){
+			if( super.validate( method ) ){
 				String methodString = Adapter.toString( method );
-				return	!methodString.startsWith("valueOf(java.lang.String)")
-						&& !methodString.startsWith("values()");
+				return	!methodString.startsWith( "valueOf(java.lang.String)" )
+						&& !methodString.startsWith( "values()" );
 			}
 			return false;
 		}
 	};
 
 	private static ClassLoader classLoader;
-	
+
 	/**
 	 * Method setClassLoader.
 	 * @param classLoader ClassLoader
 	 */
-	static void setClassLoader(ClassLoader classLoader){
+	static void setClassLoader( ClassLoader classLoader ){
 		Utils.classLoader = classLoader;
 	}
-	
+
 	private static ClassLoader getClassLoader(){
-		if( classLoader == null)
+		if( classLoader == null )
 			classLoader = Thread.currentThread().getContextClassLoader();
 		return classLoader;
 	}
@@ -252,17 +254,17 @@ final class Utils{
 	 * @return Class<?>
 	 * @throws ClassNotFoundException
 	 */
-	static Class<?> find(Class<?> containingClazz, String canonicalName) throws ClassNotFoundException{
-		if( canonicalName.equals(containingClazz.getCanonicalName()))
+	static Class<?> find( Class<?> containingClazz, String canonicalName ) throws ClassNotFoundException{
+		if( canonicalName.equals( containingClazz.getCanonicalName() ) )
 			return containingClazz;
-		
+
 		Class<?> declaredClasses[] = containingClazz.getDeclaredClasses();
-		if(declaredClasses.length > 0)
-			for(Class<?> clazz: declaredClasses){
-				if( canonicalName.equals(clazz.getCanonicalName() ) )
+		if( declaredClasses.length > 0 )
+			for( Class<?> clazz: declaredClasses ){
+				if( canonicalName.equals( clazz.getCanonicalName() ) )
 					return clazz;
-				if( canonicalName.startsWith(clazz.getCanonicalName()+"." ) )
-					return find(clazz, canonicalName);
+				if( canonicalName.startsWith( clazz.getCanonicalName() + "." ) )
+					return find( clazz, canonicalName );
 			}
 		throw new ClassNotFoundException( canonicalName + ": not found in " + containingClazz.getCanonicalName() );
 	}
@@ -273,7 +275,7 @@ final class Utils{
 	 * @return Class<?>
 	 * @throws ClassNotFoundException
 	 */
-	static Class<?> find(ClassDoc classDoc) throws ClassNotFoundException{
+	static Class<?> find( ClassDoc classDoc ) throws ClassNotFoundException{
 		if( classDoc.containingClass() == null )
 			return Class.forName( classDoc.qualifiedName(), false, Utils.getClassLoader() );
 
@@ -286,8 +288,8 @@ final class Utils{
 
 		return find( containingClass, classDoc.qualifiedName() );
 	}
-	
-	private static Collection<Type> getHierarchy(Class<?> clazz){
+
+	private static Collection<Type> getHierarchy( Class<?> clazz ){
 		Deque<Type> hierarchy = new ArrayDeque<Type>();
 		Type superClass = clazz.getGenericSuperclass();
 		while( superClass != null && !superClass.equals( Object.class ) ){
@@ -310,7 +312,7 @@ final class Utils{
 	 * @param clazz Class<?>
 	 * @return Collection<SimpleClassBinding>
 	 */
-	static Collection<SimpleClassBinding> getHierarchyBinding(Class<?> clazz){
+	static Collection<SimpleClassBinding> getHierarchyBinding( Class<?> clazz ){
 		Deque<SimpleClassBinding> hierarchy = new ArrayDeque<SimpleClassBinding>();
 		for( Type type: getHierarchy( clazz ) )
 			hierarchy.offer( SimpleClassBinding.from( type ) );
@@ -323,7 +325,7 @@ final class Utils{
 	 * @param clazz Class<?>
 	 * @return Collection<SimpleClassBinding>
 	 */
-	static Collection<SimpleClassBinding> getEnclosingClasses(Class<?> clazz){
+	static Collection<SimpleClassBinding> getEnclosingClasses( Class<?> clazz ){
 		Deque<SimpleClassBinding> enclosingClasses = new ArrayDeque<SimpleClassBinding>();
 		Class<?> enclosingClass = clazz.getEnclosingClass();
 		while( enclosingClass != null ){
@@ -338,7 +340,7 @@ final class Utils{
 	 * @param clazz Class<?>
 	 * @return Collection<SimpleClassBinding>
 	 */
-	static Collection<SimpleClassBinding> getImplementedInterfaces(Class<?> clazz){
+	static Collection<SimpleClassBinding> getImplementedInterfaces( Class<?> clazz ){
 		Deque<SimpleClassBinding> interfaces = new ArrayDeque<SimpleClassBinding>();
 		for( Type parent: getHierarchy( clazz ) ){
 			Class<?> superClass = null;
@@ -364,7 +366,7 @@ final class Utils{
 			String text = iTag.text();
 			if( text != null ){
 				Taglet t = taglets.get( iTag.name() );
-				if( t != null)
+				if( t != null )
 					t.apply( text, builder );
 				else
 					builder.append( text );
@@ -474,6 +476,22 @@ final class Utils{
 		return constants;
 	}
 	
+	private static final Comparator<FieldBinding> FieldComparator = new Comparator<FieldBinding>(){
+		/* (non-Javadoc)
+		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+		 */
+		@Override
+		public int compare( FieldBinding o1, FieldBinding o2 ){
+			if( o1.equals( o2 ) )
+				return 0;
+			if( Modifier.isStatic( o1.modifiers ) && !Modifier.isStatic( o2.modifiers ) )
+				return -1;
+			if( !Modifier.isStatic( o1.modifiers ) && Modifier.isStatic( o2.modifiers ) )
+				return 1;
+			return o1.name.compareTo( o2.name ); 
+		}
+	};
+	
 	/**
 	 * Method getFields.
 	 * @param clazz Class<?>
@@ -481,12 +499,11 @@ final class Utils{
 	 * @return Collection<FieldBinding>
 	 */
 	static Collection<FieldBinding> getFields( Class<?> clazz, ClassDoc classDoc ){
-		//TODO Ordenar
-		Deque<FieldBinding> fields = new ArrayDeque<FieldBinding>();
+		SortedSet<FieldBinding> fields = new TreeSet<FieldBinding>( FieldComparator );
 		if( classDoc == null ){
 			for( Field field: clazz.getDeclaredFields() )
 				if( FieldsFilter.validate( field ) )
-					fields.offer( new FieldBinding( field, null ) );
+					fields.add( new FieldBinding( field, null ) );
 		}else{
 			Map<String, FieldDoc> map = new TreeMap<String, FieldDoc>( Strings.CaseSensitiveComparator );
 			DocsFilter.classPosition = classDoc.position();
@@ -498,13 +515,26 @@ final class Utils{
 				if( FieldsFilter.validate( field ) ){
 					FieldDoc doc = map.remove( field.getName() );
 					assert ( doc != null ): "!!!Documentacion no encontrada para: " + field.getName();
-					fields.offer( new FieldBinding( field, doc ) );
+					fields.add( new FieldBinding( field, doc ) );
 				}
 			}
 			//			assert( map.size() == 0 ): mostrar("!!!Documentacion sobrante:", map);
 		}
 		return fields;
 	}
+	
+	
+	private static final Comparator<ConstructorBinding> ConstructorComparator = new Comparator<ConstructorBinding>(){
+		/* (non-Javadoc)
+		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+		 */
+		@Override
+		public int compare( ConstructorBinding o1, ConstructorBinding o2 ){
+			if( o1.equals( o2 ) )
+				return 0;
+			return Adapter.toString( o1 ).compareTo( Adapter.toString( o2 ) ); 
+		}
+	};
 	
 	/**
 	 * Method getConstructors.
@@ -513,8 +543,7 @@ final class Utils{
 	 * @return Collection<ConstructorBinding>
 	 */
 	static Collection<ConstructorBinding> getConstructors( Class<?> clazz, ClassDoc classDoc ){
-		//TODO Ordenar
-		Deque<ConstructorBinding> constructors = new ArrayDeque<ConstructorBinding>();
+		SortedSet<ConstructorBinding> constructors = new TreeSet<ConstructorBinding>( ConstructorComparator );
 		if( classDoc == null ){
 			for( Constructor<?> constructor: clazz.getDeclaredConstructors() )
 				if( ConstructorsFilter.validate( constructor ) )
@@ -533,7 +562,7 @@ final class Utils{
 					if( doc == null )
 						doc = map.remove( Adapter.toString( constructor, true ) );
 					if( doc != null )
-						constructors.offer( new ConstructorBinding( constructor, doc ) );
+						constructors.add( new ConstructorBinding( constructor, doc ) );
 					else
 						undocumented.add( Adapter.toString( constructor ) );
 				}
@@ -545,6 +574,26 @@ final class Utils{
 		return constructors;
 	}
 	
+	private static final Comparator<MethodBinding> MethodComparator = new Comparator<MethodBinding>(){
+		/* (non-Javadoc)
+		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+		 */
+		@Override
+		public int compare( MethodBinding o1, MethodBinding o2 ){
+			if( o1.equals( o2 ) )
+				return 0;
+			if( Modifier.isStatic( o1.modifiers ) && !Modifier.isStatic( o2.modifiers ) )
+				return -1;
+			if( !Modifier.isStatic( o1.modifiers ) && Modifier.isStatic( o2.modifiers ) )
+				return 1;
+			if( Modifier.isAbstract( o1.modifiers ) && !Modifier.isAbstract( o2.modifiers ) )
+				return 1;
+			if( !Modifier.isAbstract( o1.modifiers ) && Modifier.isAbstract( o2.modifiers ) )
+				return -1;
+			return Adapter.toString( o1 ).compareTo( Adapter.toString( o2 ) ); 
+		}
+	};
+	
 	/**
 	 * Method getMethods.
 	 * @param clazz Class<?>
@@ -552,14 +601,12 @@ final class Utils{
 	 * @return Collection<MethodBinding>
 	 */
 	static Collection<MethodBinding> getMethods( Class<?> clazz, ClassDoc classDoc ){
-		//TODO Ordenar
 		final Filter<Method> filter = clazz.isEnum() ? EnumMethodsFilter: MethodsFilter;
-
-		Deque<MethodBinding> methods = new ArrayDeque<MethodBinding>();
+		SortedSet<MethodBinding> methods = new TreeSet<MethodBinding>( MethodComparator );
 		if( classDoc == null ){
 			for( Method method: clazz.getDeclaredMethods() )
 				if( filter.validate( method ) )
-					methods.offer( new MethodBinding( method, null ) );
+					methods.add( new MethodBinding( method, null ) );
 		}else{
 			final DocFilter<? super MethodDoc> filterDoc;
 			if( clazz.isEnum() )
@@ -579,7 +626,7 @@ final class Utils{
 				if( filter.validate( method ) ){
 					MethodDoc doc = map.remove( Adapter.toString( method ) );
 					if( doc != null )
-						methods.offer( new MethodBinding( method, doc ) );
+						methods.add( new MethodBinding( method, doc ) );
 					else
 						undocumented.add( Adapter.toString( method ) );
 				}
@@ -1185,5 +1232,13 @@ public abstract class ClassBinding extends DocumentedElement{
 	
 	public void setGraphic( Graphic graphic ){
 		this.graphic = graphic;
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString(){
+		return name;
 	}
 }

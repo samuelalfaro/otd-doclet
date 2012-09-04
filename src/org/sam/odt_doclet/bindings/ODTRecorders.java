@@ -24,6 +24,7 @@ package org.sam.odt_doclet.bindings;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
+import java.util.Iterator;
 
 import org.htmlcleaner.ContentNode;
 import org.htmlcleaner.TagNode;
@@ -282,8 +283,15 @@ final class ODTRecorders extends Recorders{
 			writeTitle( title, styleTitle, level, writer );
 			writer.openNode( "text:p" );
 				writer.addAttribute( "text:style-name", styleCollection );
-				for( T t: collection )
+				Iterator<T> it = collection.iterator();
+				do{
+					T t = it.next();
 					mapper.getRecorder( t.getClass() ).record( t, writer, mapper );
+					if( it.hasNext() )
+						writer.emptyNode( "text:line-break" );
+					else
+						break;
+				}while( true );
 			writer.closeUntilParent("text:p");
 		}
 	}
@@ -297,7 +305,7 @@ final class ODTRecorders extends Recorders{
 		 */
 		@Override
 		public void record( LinkBinding l, XMLWriter writer, RecordersMapper mapper ) throws IOException{
-			writer.emptyNode( "text:line-break" );
+
 			writer.openNode( "text:a" );
 				writer.addAttribute( "xlink:type", "simple" );
 				writer.addAttribute( "xlink:href", l.link );
@@ -315,7 +323,6 @@ final class ODTRecorders extends Recorders{
 		 */
 		@Override
 		public void record( DocumentedType t, XMLWriter writer, RecordersMapper mapper ) throws IOException{
-			writer.emptyNode( "text:line-break" );
 			writer.openNode( "text:span" );
 				writer.addAttribute( "text:style-name", "AutoStyleB" );
 				writer.write( t.type + ": ");
@@ -336,7 +343,6 @@ final class ODTRecorders extends Recorders{
 		 */
 		@Override
 		public void record( ParameterBinding t, XMLWriter writer, RecordersMapper mapper ) throws IOException{
-			writer.emptyNode( "text:line-break" );
 			writer.openNode( "text:span" );
 				writer.addAttribute( "text:style-name", "AutoStyleB" );
 				if( t.name != null ){
@@ -487,8 +493,8 @@ final class ODTRecorders extends Recorders{
 					ODTHelper.insertImage( writer, "Graphics", t.graphic );
 				writer.closeNode();
 			}
-			insertParagraph( "Standard", t.documentation, writer );
 			writeCollection( "Parámetros:", "Heading_20_5", 5, t.parameters, "Standard", writer, mapper );
+			insertParagraph( "Standard", t.documentation, writer );
 			writeCollection( "Mire También:", "Heading_20_5", 5, t.links, "Standard", writer, mapper );
 			writeCollection( "Atributos:", "Heading_20_3", 3, t.fields, writer, mapper );
 			writeCollection( "Métodos:", "Heading_20_3", 3, t.methods, writer, mapper );
@@ -548,8 +554,8 @@ final class ODTRecorders extends Recorders{
 					ODTHelper.insertImage( writer, "Graphics", t.graphic );
 				writer.closeNode();
 			}
-			insertParagraph( "Standard", t.documentation, writer );
 			writeCollection( "Parámetros:", "Heading_20_5", 5, t.parameters, "Standard", writer, mapper );
+			insertParagraph( "Standard", t.documentation, writer );
 			writeCollection( "Mire También:", "Heading_20_5", 5, t.links, "Standard", writer, mapper );
 			writeCollection( "Atributos:", "Heading_20_3", 3, t.fields, writer, mapper );
 			writeCollection( "Constructores:", "Heading_20_3", 3, t.constructors, writer, mapper );

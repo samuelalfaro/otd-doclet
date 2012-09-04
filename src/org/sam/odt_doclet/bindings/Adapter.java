@@ -28,6 +28,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
+import java.util.Iterator;
 
 import com.sun.javadoc.ConstructorDoc;
 import com.sun.javadoc.MethodDoc;
@@ -203,6 +204,22 @@ public final class Adapter {
 		return buff.toString();
 	}
 	
+	public static String toString( CommandBinding command ){
+		StringBuffer buff = new StringBuffer( command.name );
+		buff.append( '(' );
+		if( command.params != null ){
+			Iterator<ParameterBinding> it = command.params.iterator();
+			while( it.hasNext() ){
+				ParameterBinding p = it.next();
+				buff.append( p.type );
+				if( it.hasNext() )
+					buff.append( ", " );
+			}
+		}
+		buff.append( ')' );
+		return buff.toString();
+	}
+	
 	/**
 	 * Method toString.
 	 * @param constructor Constructor<?>
@@ -252,4 +269,5 @@ public final class Adapter {
 	public static String toString( MethodDoc method ){
 		return toString( method.name(), method.parameters() );
 	}
+
 }
