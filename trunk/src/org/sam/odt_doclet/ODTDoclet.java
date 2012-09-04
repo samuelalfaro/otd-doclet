@@ -27,6 +27,7 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,11 +36,15 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
+import java.util.Properties;
 import java.util.Queue;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.xml.transform.TransformerConfigurationException;
 
 import org.sam.odt_doclet.UnitsDimension.Units;
@@ -52,13 +57,11 @@ import org.sam.xml.XMLConverter;
 import org.sam.xml.XMLWriter;
 
 import com.sun.javadoc.ClassDoc;
-import com.sun.javadoc.DocErrorReporter;
 import com.sun.javadoc.RootDoc;
-import com.sun.tools.doclets.standard.Standard;
 
 /**
  */
-public final class ODTDoclet extends Standard{
+public final class ODTDoclet{
 
 	static final Charset UTF8 = Charset.forName( "UTF-8" );
 	static final int dpi = 300;
@@ -167,7 +170,7 @@ public final class ODTDoclet extends Standard{
 		
 		UnitsDimension ptDim = new UnitsDimension( "14", "14", Units.Points );
 		bulletGenerator.setDimension( ptDim.toPixelsDimension( dpi ) );
-		
+		System.out.println( "Generando bullets..." );
 		for( BulletGenerator.Bullet bullet: BulletGenerator.Bullet.values() ){
 			String pictPath = "Pictures/" + bullet + ".png";
 			System.out.println( bullet );
@@ -181,12 +184,14 @@ public final class ODTDoclet extends Standard{
 		UMLDiagramGenerator generator = new UMLDiagramGenerator();
 		generator.setScale( scaleFactor );
 		
+		System.out.println( "Generando diagramas UML..." );
 		for( ClassDoc classDoc: root.classes() )
 			try{
 				ClassBinding clazz = ClassBindingFactory.createBinding( classDoc );
 				
 				String pictName = classDoc.qualifiedName();
 				String pictPath = "Pictures/" + pictName + ".png";
+				System.out.println( pictName );
 				
 				out.putNextEntry( new ZipEntry( pictPath ) );
 					manifest.addImage( pictPath );
@@ -207,35 +212,18 @@ public final class ODTDoclet extends Standard{
 		Recorders.register( Recorders.Mode.ODT, converter );
 		converter.setWriter( writer );
 		
+		System.out.println( "Generando texto..." );
 		ODTHelper.beginDocumenContent( writer );
-		for( ClassBinding clazz: classes )
+		for( ClassBinding clazz: classes ){
+			System.out.println( clazz );
 			converter.write( clazz );
+		}
 
 		ODTHelper.endDocumenContent( writer );
 
 		out.putNextEntry( new ZipEntry( "META-INF/manifest.xml" ) );
 		out.write( manifest.getBytes() );
 		out.close();
-
-	}
-
-	/**
-	 * Method optionLength.
-	 * @param option String
-	 * @return int
-	 */
-	public static int optionLength( String option ){
-		return DocletValidator.optionLength( option );
-	}
-
-	/**
-	 * Method validOptions.
-	 * @param options String[][]
-	 * @param reporter DocErrorReporter
-	 * @return boolean
-	 */
-	public static boolean validOptions( String options[][], DocErrorReporter reporter ){
-		return DocletValidator.validOptions( options, reporter ) || Standard.validOptions( options, reporter );
 	}
 
 	/**
@@ -246,8 +234,45 @@ public final class ODTDoclet extends Standard{
 	public static boolean start( RootDoc root ){
 		System.out.println("Generando documentanción...");
 		try{
-			File fileOutput = new File( "output/result.odt" );
-			generarODT( Loader.getResourceAsStream( "resources/plantilla.odt" ), fileOutput, root );
+			
+			JFileChooser chooser = new JFileChooser();
+			
+			chooser.setCurrentDirectory( new File( "." ) );
+			chooser.setSelectedFile( new File( "odt-doclet.conf" ) );
+			chooser.setFileFilter( new FileNameExtensionFilter( "Archivos configuarción", "conf", "ini", "properties" ) );
+			chooser.setDialogTitle( "Indique la ubicación del archivo de configuración" );
+			if( chooser.showOpenDialog( null ) == JFileChooser.APPROVE_OPTION ){
+				Properties properties = new Properties();
+				try{
+					properties.load( new FileInputStream( chooser.getSelectedFile().getCanonicalFile() ) );
+					ClassBindingFactory.setClassLoader( ClassLoaderTools.getLoader(
+							properties.getProperty( "projectClasspath" ),
+							properties.getProperty( "projectLibpath" ) )
+					);
+				}catch( IOException ignorada ){
+				}
+			}
+			
+			chooser.setCurrentDirectory( new File( "." ) );
+			chooser.setSelectedFile( new File( "result.odt" ) );
+			chooser.setFileFilter( new FileNameExtensionFilter( "Documentos text OTD", "odt" ) );
+			chooser.setDialogTitle( "Indique el archivo de destino" );
+			File saveTo  = null;
+			if( chooser.showSaveDialog( null ) == JFileChooser.APPROVE_OPTION ){
+				try{
+					saveTo = chooser.getSelectedFile().getCanonicalFile();
+				}catch( IOException ignorada ){
+				}
+				if( saveTo.exists() && JOptionPane.showConfirmDialog(
+						null,
+						"El archivo ya existe.\n¿Desea sobreescribirlo?",
+					    "Confirme",
+					    JOptionPane.YES_NO_OPTION,
+					    JOptionPane.WARNING_MESSAGE ) != JOptionPane.YES_OPTION )
+					return false;
+			}
+			System.out.println("Creando archvo: " + saveTo.getAbsolutePath() + saveTo.getName() + " ...");
+			generarODT( Loader.getResourceAsStream( "resources/plantilla.odt" ), saveTo, root );
 			return true;
 		}catch( IOException e ){
 			e.printStackTrace();

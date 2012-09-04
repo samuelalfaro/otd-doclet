@@ -29,31 +29,11 @@ import org.sam.xml.XMLConverter;
 import org.sam.xml.XMLWriter;
 
 import com.sun.javadoc.ClassDoc;
-import com.sun.javadoc.DocErrorReporter;
 import com.sun.javadoc.RootDoc;
 
 /**
  */
 public final class XMLDoclet{
-	
-	/**
-	 * Method optionLength.
-	 * @param option String
-	 * @return int
-	 */
-	public static int optionLength( String option ){
-		return DocletValidator.optionLength( option );
-	}
-	
-	/**
-	 * Method validOptions.
-	 * @param options String[][]
-	 * @param reporter DocErrorReporter
-	 * @return boolean
-	 */
-	public static boolean validOptions( String options[][], DocErrorReporter reporter ){
-		return DocletValidator.validOptions( options, reporter );
-	}
 	
 	/**
 	 * Method start.

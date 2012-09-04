@@ -32,9 +32,9 @@ import java.util.Deque;
  * 
  */
 public final class XMLWriter{
-	
+
 	private static Appendable getAppendable( OutputStream out ){
-		if( Appendable.class.isAssignableFrom( out.getClass() )  )
+		if( Appendable.class.isAssignableFrom( out.getClass() ) )
 			return (Appendable)out;
 		try{
 			return new PrintStream( out, true, "UTF-8" );
@@ -43,27 +43,32 @@ public final class XMLWriter{
 			return null;
 		}
 	}
-	
+
 	private interface TabsManager{
-		
+
 		/**
 		 * {@code TabsManager} que no hace nada.
 		 */
 		static final TabsManager Default = new TabsManager(){
 
-			/* (non-Javadoc)
+			/*
+			 * (non-Javadoc)
 			 * @see org.sam.xml.XMLWriter.TabsManager#add()
 			 */
 			@Override
-			final public void add(){}
-			
-			/* (non-Javadoc)
+			final public void add(){
+			}
+
+			/*
+			 * (non-Javadoc)
 			 * @see org.sam.xml.XMLWriter.TabsManager#remove()
 			 */
 			@Override
-			final public void remove(){}
+			final public void remove(){
+			}
 
-			/* (non-Javadoc)
+			/*
+			 * (non-Javadoc)
 			 * @see org.sam.xml.XMLWriter.TabsManager#get()
 			 */
 			@Override
@@ -71,31 +76,34 @@ public final class XMLWriter{
 				return "";
 			}
 		};
-		
+
 		/**
 		 * {@code TabsManager} que tabula el contenido usando tabuladores.
 		 */
 		static final class Tabulate implements TabsManager{
-			
+
 			private String tabs = "";
-			
-			/* (non-Javadoc)
+
+			/*
+			 * (non-Javadoc)
 			 * @see org.sam.xml.XMLWriter.TabsManager#add()
 			 */
 			@Override
 			final public void add(){
-				tabs = tabs.concat("\t");
+				tabs = tabs.concat( "\t" );
 			}
-			
-			/* (non-Javadoc)
+
+			/*
+			 * (non-Javadoc)
 			 * @see org.sam.xml.XMLWriter.TabsManager#remove()
 			 */
 			@Override
 			final public void remove(){
-				tabs = tabs.substring(1);
+				tabs = tabs.substring( 1 );
 			}
 
-			/* (non-Javadoc)
+			/*
+			 * (non-Javadoc)
 			 * @see org.sam.xml.XMLWriter.TabsManager#get()
 			 */
 			@Override
@@ -103,39 +111,42 @@ public final class XMLWriter{
 				return tabs;
 			}
 		}
-		
+
 		/**
 		 * {@code TabsManager} que tabula el contenido usando espacios.
 		 */
 		static final class Spaces implements TabsManager{
-			
+
 			private final String spacesTab;
 			private String tabs = "";
-			
-			Spaces(int nSpaces){
+
+			Spaces( int nSpaces ){
 				StringBuilder builder = new StringBuilder();
 				for( int i = 0; i < nSpaces; i++ )
 					builder.append( ' ' );
 				spacesTab = builder.toString();
 			}
-			
-			/* (non-Javadoc)
+
+			/*
+			 * (non-Javadoc)
 			 * @see org.sam.xml.XMLWriter.TabsManager#add()
 			 */
 			@Override
 			final public void add(){
-				tabs = tabs.concat(spacesTab);
+				tabs = tabs.concat( spacesTab );
 			}
-			
-			/* (non-Javadoc)
+
+			/*
+			 * (non-Javadoc)
 			 * @see org.sam.xml.XMLWriter.TabsManager#remove()
 			 */
 			@Override
 			final public void remove(){
-				tabs = tabs.substring(spacesTab.length());
+				tabs = tabs.substring( spacesTab.length() );
 			}
 
-			/* (non-Javadoc)
+			/*
+			 * (non-Javadoc)
 			 * @see org.sam.xml.XMLWriter.TabsManager#get()
 			 */
 			@Override
@@ -143,12 +154,12 @@ public final class XMLWriter{
 				return tabs;
 			}
 		}
-		
+
 		/**
 		 * Añade una tabulación.
 		 */
 		void add();
-		
+
 		/**
 		 * Elimina una tabulación.
 		 */
@@ -159,9 +170,9 @@ public final class XMLWriter{
 		 */
 		String get();
 	}
-	
+
 	private interface StringDigester{
-		
+
 		StringDigester Default = new StringDigester(){
 			public void digestString( String content, Appendable out ) throws IOException{
 				out.append( content );
@@ -210,7 +221,7 @@ public final class XMLWriter{
 				}
 			}
 		};
-		
+
 		void digestString( String content, Appendable out ) throws IOException;
 	}
 
@@ -223,16 +234,16 @@ public final class XMLWriter{
 			this.isSingleLineNode = isSingleLineNode;
 		}
 	}
-	
-	private final Appendable   out;
-	private final Deque<Node>  nodeStack;
+
+	private final Appendable out;
+	private final Deque<Node> nodeStack;
 	private final StringBuffer attributes;
-	private final TabsManager  tabs;
-	private final String       eol;
-	
-	private transient boolean isFirstCall       = true;
+	private final TabsManager tabs;
+	private final String eol;
+
+	private transient boolean isFirstCall = true;
 	private transient boolean isClosedStartNode = true;
-	private transient boolean hasContent        = false;
+	private transient boolean hasContent = false;
 
 	private XMLWriter( Appendable out, TabsManager manager ){
 		this.out = out;
@@ -242,7 +253,7 @@ public final class XMLWriter{
 		this.tabs = manager;
 		this.eol = manager != TabsManager.Default ? System.getProperty( "line.separator" ): "";
 	}
-	
+
 	/**
 	 * Constructor for XMLWriter.
 	 * @param out
@@ -267,8 +278,8 @@ public final class XMLWriter{
 	 */
 	public XMLWriter( Appendable out ){
 		this( out, TabsManager.Default );
-	} 
-	
+	}
+
 	/**
 	 * Constructor for XMLWriter.
 	 * @param out
@@ -286,24 +297,22 @@ public final class XMLWriter{
 	public XMLWriter( OutputStream out, int tabulateSpaces ){
 		this( getAppendable( out ), tabulateSpaces > 0 ? new TabsManager.Spaces( tabulateSpaces ): TabsManager.Default );
 	}
-	
+
 	/**
 	 * Constructor for XMLWriter.
 	 * @param out
 	 */
 	public XMLWriter( OutputStream out ){
 		this( getAppendable( out ), TabsManager.Default );
-	} 
-	
-	
-	
+	}
+
 	private void flushAttributes() throws IOException{
 		if( attributes.length() > 0 ){
 			out.append( attributes.toString() );
 			attributes.setLength( 0 );
 		}
 	}
-	
+
 	/**
 	 * Method openNode.
 	 * @param nodeName String
@@ -317,14 +326,14 @@ public final class XMLWriter{
 			isFirstCall = false;
 		else if( nodeStack.peek() == null || !nodeStack.peek().isSingleLineNode )
 			out.append( eol ).append( tabs.get() );
-		
+
 		out.append( '<' ).append( nodeName );
 		isClosedStartNode = false;
 		hasContent = false;
 		nodeStack.push( new Node( nodeName, false ) );
 		tabs.add();
 	}
-	
+
 	/**
 	 * Method addAttribute.
 	 * @param name String
@@ -339,24 +348,24 @@ public final class XMLWriter{
 			attributes.append( '\"' );
 		}
 	}
-	
+
 	/**
 	 * Method addAttribute.
 	 * @param name String
 	 * @param value boolean
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public void addAttribute( String name, boolean value ) throws IOException{
 		if( isClosedStartNode )
 			throw new IllegalStateException();
 		attributes.append( ' ' ).append( name ).append( "=\"" ).append( value ).append( '\"' );
 	}
-	
+
 	/**
 	 * Method addAttribute.
 	 * @param name String
 	 * @param value char
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public void addAttribute( String name, char value ) throws IOException{
 		if( isClosedStartNode )
@@ -383,55 +392,55 @@ public final class XMLWriter{
 		}
 		attributes.append( '\"' );
 	}
-	
+
 	/**
 	 * Method addAttribute.
 	 * @param name String
 	 * @param value int
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public void addAttribute( String name, int value ) throws IOException{
 		if( isClosedStartNode )
 			throw new IllegalStateException();
 		attributes.append( ' ' ).append( name ).append( "=\"" ).append( value ).append( '\"' );
 	}
-	
+
 	/**
 	 * Method addAttribute.
 	 * @param name String
 	 * @param value long
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public void addAttribute( String name, long value ) throws IOException{
 		if( isClosedStartNode )
 			throw new IllegalStateException();
 		attributes.append( ' ' ).append( name ).append( "=\"" ).append( value ).append( '\"' );
 	}
-	
+
 	/**
 	 * Method addAttribute.
 	 * @param name String
 	 * @param value float
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public void addAttribute( String name, float value ) throws IOException{
 		if( isClosedStartNode )
 			throw new IllegalStateException();
 		attributes.append( ' ' ).append( name ).append( "=\"" ).append( value ).append( '\"' );
 	}
-	
+
 	/**
 	 * Method addAttribute.
 	 * @param name String
 	 * @param value double
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public void addAttribute( String name, double value ) throws IOException{
 		if( isClosedStartNode )
 			throw new IllegalStateException();
 		attributes.append( ' ' ).append( name ).append( "=\"" ).append( value ).append( '\"' );
 	}
-	
+
 	/**
 	 * Method addAttribute.
 	 * @param name String
@@ -441,13 +450,13 @@ public final class XMLWriter{
 		if( value != null )
 			addAttribute( name, value.toString() );
 	}
-	
+
 	public void discardAttributes(){
 		if( isClosedStartNode )
 			throw new IllegalStateException();
 		attributes.setLength( 0 );
 	}
-	
+
 	private void write( String content, StringDigester digester ) throws IOException{
 		hasContent = content != null && content.length() > 0;
 		if( hasContent ){
@@ -462,7 +471,7 @@ public final class XMLWriter{
 				nodeStack.peek().isSingleLineNode = true;
 		}
 	}
-	
+
 	/**
 	 * Method writeCDATA.
 	 * @param content String
@@ -471,14 +480,14 @@ public final class XMLWriter{
 	public void writeCDATA( String content ) throws IOException{
 		write( content, StringDigester.CDATA );
 	}
-	
+
 	/**
 	 * @param content
 	 */
 	public void write( String content ) throws IOException{
 		write( content, StringDigester.XMLCharsFilter );
 	}
-	
+
 	/**
 	 * @param content
 	 */
@@ -489,7 +498,7 @@ public final class XMLWriter{
 	public void closeNode() throws IOException{
 		tabs.remove();
 		Node previous = nodeStack.pop();
-	
+
 		if( hasContent ){
 			if( !previous.isSingleLineNode )
 				out.append( eol ).append( tabs.get() );
@@ -501,20 +510,20 @@ public final class XMLWriter{
 		isClosedStartNode = true;
 		hasContent = true;
 	}
-	
+
 	public void emptyNode( String nodeName ) throws IOException{
 		openNode( nodeName );
 		closeNode();
 	}
-	
+
 	public String getCurrentNodeName(){
-		return  nodeStack.size() == 0 ? "": nodeStack.peek().name;
+		return nodeStack.size() == 0 ? "": nodeStack.peek().name;
 	}
-	
+
 	public boolean currentNodeHasContent(){
 		return hasContent;
 	}
-	
+
 	public boolean hasParent( String nodeName ){
 		for( Node node: nodeStack )
 			if( node.name.equals( nodeName ) )
