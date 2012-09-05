@@ -31,8 +31,8 @@ public final class ClassBindingFactory{
 	 * Method setClassLoader.
 	 * @param classLoader ClassLoader
 	 */
-	public static void setClassLoader(ClassLoader classLoader){
-		Utils.setClassLoader(classLoader);
+	public static void setClassLoader( ClassLoader classLoader ){
+		Utils.setClassLoader( classLoader );
 	}
 
 	private static ClassBinding newInstance( Class<?> clazz, ClassDoc classDoc ){
@@ -59,7 +59,7 @@ public final class ClassBindingFactory{
 	 * @throws ClassNotFoundException
 	 */
 	public static ClassBinding createBinding( ClassDoc classDoc ) throws ClassNotFoundException{
-		return newInstance( Utils.find(classDoc), classDoc );
+		return newInstance( Utils.find( classDoc ), classDoc );
 	}
 	
 	/**

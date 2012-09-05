@@ -39,14 +39,14 @@ import com.sun.javadoc.RootDoc;
 public class ListClass {
 	
 	private static final Comparator<PackageDoc> COMPARADOR_DE_PACKAGES = new Comparator<PackageDoc>() {
-		/** {@inheritDoc} */
+		@Override
 		public int compare(PackageDoc e1, PackageDoc e2) {
 			return e1.name().compareTo(e2.name());
 		}
 	};
 	
 	private static final Comparator<ClassDoc> COMPARADOR_POR_NOMBRE = new Comparator<ClassDoc>(){
-		/** {@inheritDoc} */
+		@Override
 		public int compare( ClassDoc e1, ClassDoc e2 ){
 			return e1.name().compareTo( e2.name() );
 		}
@@ -72,7 +72,7 @@ public class ListClass {
 			return name;
 		}
 		
-		/** {@inheritDoc} */
+		@Override
 		public int compare( ClassDoc e1, ClassDoc e2 ){
 			return getHierarchicalName( e1 ).compareTo( getHierarchicalName( e2 ) );
 		}
@@ -101,20 +101,20 @@ public class ListClass {
 				OUT.println("\t"+classDoc.name());
 		}
 
-		SortedSet<PackageDoc> sortedPackages = new TreeSet<PackageDoc>(COMPARADOR_DE_PACKAGES);
-		sortedPackages.addAll( Arrays.asList(root.specifiedPackages()) );
+		SortedSet<PackageDoc> sortedPackages = new TreeSet<PackageDoc>( COMPARADOR_DE_PACKAGES );
+		sortedPackages.addAll( Arrays.asList( root.specifiedPackages() ) );
 
-		for(PackageDoc packageDoc: sortedPackages){
-			OUT.println(packageDoc+"\n");
-			SortedSet<ClassDoc> sortedInterfaces = new TreeSet<ClassDoc>(COMPARADOR_POR_NOMBRE);
-			SortedSet<ClassDoc> sortedClasses    = new TreeSet<ClassDoc>(COMPARADOR_DE_CLASES);
-			SortedSet<ClassDoc> sortedException  = new TreeSet<ClassDoc>(COMPARADOR_POR_NOMBRE);
-			SortedSet<ClassDoc> sortedEnums      = new TreeSet<ClassDoc>(COMPARADOR_POR_NOMBRE);
+		for( PackageDoc packageDoc: sortedPackages ){
+			OUT.println( packageDoc + "\n" );
+			SortedSet<ClassDoc> sortedInterfaces = new TreeSet<ClassDoc>( COMPARADOR_POR_NOMBRE );
+			SortedSet<ClassDoc> sortedClasses    = new TreeSet<ClassDoc>( COMPARADOR_DE_CLASES );
+			SortedSet<ClassDoc> sortedException  = new TreeSet<ClassDoc>( COMPARADOR_POR_NOMBRE );
+			SortedSet<ClassDoc> sortedEnums      = new TreeSet<ClassDoc>( COMPARADOR_POR_NOMBRE );
 
-			sortedInterfaces.addAll(Arrays.asList(packageDoc.interfaces()));
-			sortedException.addAll(Arrays.asList(packageDoc.exceptions()));
-			sortedClasses.addAll(Arrays.asList(packageDoc.ordinaryClasses()));
-			sortedEnums.addAll(Arrays.asList(packageDoc.enums()));
+			sortedInterfaces.addAll( Arrays.asList( packageDoc.interfaces() ) );
+			sortedException.addAll( Arrays.asList( packageDoc.exceptions() ) );
+			sortedClasses.addAll( Arrays.asList( packageDoc.ordinaryClasses() ) );
+			sortedEnums.addAll( Arrays.asList( packageDoc.enums() ) );
 			
 			print("Interfaces:", sortedInterfaces);
 			print("Exceptions:", sortedException);
