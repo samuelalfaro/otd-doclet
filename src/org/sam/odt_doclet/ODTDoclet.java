@@ -232,7 +232,7 @@ public final class ODTDoclet{
 	 * @return boolean
 	 */
 	public static boolean start( RootDoc root ){
-		System.out.println("Generando documentanción...");
+		System.out.println("Generando documentación...");
 		try{
 			
 			JFileChooser chooser = new JFileChooser();
