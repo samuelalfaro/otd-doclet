@@ -62,8 +62,8 @@ final class Strings{
 	private Strings(){}
 	
 	static final Comparator<String> CaseSensitiveComparator = new Comparator<String>(){
-		public int compare(String o1, String o2) {
-			return o1.compareTo(o2);
+		public int compare( String o1, String o2 ){
+			return o1.compareTo( o2 );
 		}
 	};
 }
@@ -138,10 +138,10 @@ final class Utils{
 		 * @see org.sam.odf_doclet.bindings.Utils.Filter#validate(java.lang.Object)
 		 */
 		@Override
-		public boolean validate(T doc) {
+		public boolean validate( T doc ){
 			//FIXME Comparamos la posicion pues el metodo isSynthetic() devuevle siempre ¿ false ? 
 			SourcePosition docPosition = doc.position();
-			return docPosition != null && ( docPosition.line() != classPosition.line() || docPosition.column() != classPosition.column());
+			return docPosition != null && ( docPosition.line() != classPosition.line() || docPosition.column() != classPosition.column() );
 		}
 	}
 	
@@ -407,14 +407,14 @@ final class Utils{
 	 * @return Collection<LinkBinding>
 	 */
 	static Collection<LinkBinding> getLinks( Doc doc ){
-		if(doc == null)
+		if( doc == null )
 			return null;
 		SeeTag[] tags = doc.seeTags();
-		if(tags == null || tags.length == 0)
+		if( tags == null || tags.length == 0 )
 			return null;
-		Collection<LinkBinding> links = new ArrayDeque<LinkBinding>(tags.length);
-		for(SeeTag tag:tags)
-			links.add(new LinkBinding(tag.text()));
+		Collection<LinkBinding> links = new ArrayDeque<LinkBinding>( tags.length );
+		for( SeeTag tag: tags )
+			links.add( new LinkBinding( tag.text() ) );
 		return links;
 	}
 	
@@ -1113,18 +1113,18 @@ class MethodBinding extends CommandBinding{
 	 * @param method Method
 	 * @param doc MethodDoc
 	 */
-	MethodBinding( Method method, MethodDoc doc){
-		super( method, checkOverride(doc) );
+	MethodBinding( Method method, MethodDoc doc ){
+		super( method, checkOverride( doc ) );
 
 		this.modifiers = method.getModifiers();
 
-		if( method.getReturnType().equals(java.lang.Void.TYPE) )
+		if( method.getReturnType().equals( java.lang.Void.TYPE ) )
 			returnType = null;
 		else{
 			if( doc == null )
-				returnType = new ReturnTypeBinding(method.getGenericReturnType());
+				returnType = new ReturnTypeBinding( method.getGenericReturnType() );
 			else
-				returnType = new ReturnTypeBinding(method.getGenericReturnType(), doc.tags("@return"));
+				returnType = new ReturnTypeBinding( method.getGenericReturnType(), doc.tags( "@return" ) );
 		}
 	}
 }
@@ -1144,15 +1144,15 @@ public abstract class ClassBinding extends DocumentedElement{
 		 * @param clazz Class<?>
 		 * @param classDoc ClassDoc
 		 */
-		Interface( Class<?> clazz, ClassDoc classDoc) {
+		Interface( Class<?> clazz, ClassDoc classDoc ){
 			super( clazz, classDoc );
-			this.parameters = Utils.getTypeParams(clazz, classDoc);
-			
-			this.enclosingClasses = Utils.getEnclosingClasses(clazz);
-			this.interfaces = Utils.getImplementedInterfaces(clazz);
-			
-			this.fields = Utils.getFields(clazz, classDoc);
-			this.methods = Utils.getMethods(clazz, classDoc);
+			this.parameters = Utils.getTypeParams( clazz, classDoc );
+
+			this.enclosingClasses = Utils.getEnclosingClasses( clazz );
+			this.interfaces = Utils.getImplementedInterfaces( clazz );
+
+			this.fields = Utils.getFields( clazz, classDoc );
+			this.methods = Utils.getMethods( clazz, classDoc );
 		}
 	}
 	
@@ -1171,13 +1171,13 @@ public abstract class ClassBinding extends DocumentedElement{
 		Enum( Class<?> clazz, ClassDoc classDoc) {
 			super( clazz, classDoc );
 	
-			this.enclosingClasses = Utils.getEnclosingClasses(clazz);
-			this.interfaces = Utils.getImplementedInterfaces(clazz);
-			
-			this.constants = Utils.getConstants(clazz, classDoc);
-			this.fields = Utils.getFields(clazz, classDoc);
-			this.constructors = Utils.getConstructors(clazz, classDoc);
-			this.methods = Utils.getMethods(clazz, classDoc);
+			this.enclosingClasses = Utils.getEnclosingClasses( clazz );
+			this.interfaces = Utils.getImplementedInterfaces( clazz );
+
+			this.constants = Utils.getConstants( clazz, classDoc );
+			this.fields = Utils.getFields( clazz, classDoc );
+			this.constructors = Utils.getConstructors( clazz, classDoc );
+			this.methods = Utils.getMethods( clazz, classDoc );
 		}
 	
 	}
@@ -1201,17 +1201,25 @@ public abstract class ClassBinding extends DocumentedElement{
 			super( clazz, classDoc);
 
 			this.isAbstract = Modifier.isAbstract( clazz.getModifiers() );
-			this.parameters = Utils.getTypeParams(clazz, classDoc);
-			
-			this.hierarchy = Utils.getHierarchyBinding(clazz);
-			this.enclosingClasses = Utils.getEnclosingClasses(clazz);
-			this.interfaces = Utils.getImplementedInterfaces(clazz);
-			
-			this.fields = Utils.getFields(clazz, classDoc);
-			this.constructors = Utils.getConstructors(clazz, classDoc);
-			this.methods = Utils.getMethods(clazz, classDoc);
+			this.parameters = Utils.getTypeParams( clazz, classDoc );
+
+			this.hierarchy = Utils.getHierarchyBinding( clazz );
+			this.enclosingClasses = Utils.getEnclosingClasses( clazz );
+			this.interfaces = Utils.getImplementedInterfaces( clazz );
+
+			this.fields = Utils.getFields( clazz, classDoc );
+			this.constructors = Utils.getConstructors( clazz, classDoc );
+			this.methods = Utils.getMethods( clazz, classDoc );
 		}
 	}
+	
+	public static final Comparator<ClassBinding> COMPARADOR = new Comparator<ClassBinding>() {
+		public int compare( ClassBinding e1, ClassBinding e2 ){
+			return e1.sortingName.compareTo( e2.sortingName );
+		}
+	};
+	
+	final String sortingName;
 	
 	Graphic graphic;
 	
@@ -1228,6 +1236,7 @@ public abstract class ClassBinding extends DocumentedElement{
 	 */
 	ClassBinding( Class<?> clazz, ClassDoc classDoc ){
 		super( Adapter.toString( clazz ), classDoc );
+		sortingName = Adapter.getSortingName( clazz );
 	}
 	
 	public void setGraphic( Graphic graphic ){

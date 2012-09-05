@@ -35,9 +35,9 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
-import java.util.LinkedList;
 import java.util.Properties;
-import java.util.Queue;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -180,7 +180,7 @@ public final class ODTDoclet{
 			out.closeEntry();
 		}
 
-		Queue<ClassBinding> classes = new LinkedList<ClassBinding>();
+		SortedSet<ClassBinding> classes = new TreeSet<ClassBinding>( ClassBinding.COMPARADOR );
 		UMLDiagramGenerator generator = new UMLDiagramGenerator();
 		generator.setScale( scaleFactor );
 		
@@ -199,7 +199,7 @@ public final class ODTDoclet{
 				out.closeEntry();
 				
 				clazz.setGraphic( new Graphic( pictName, pictPath, dim, dpi ) );
-				classes.offer( clazz );
+				classes.add( clazz );
 			}catch( ClassNotFoundException e ){
 				e.printStackTrace();
 			}
@@ -272,6 +272,7 @@ public final class ODTDoclet{
 					return false;
 			}
 			System.out.println("Creando archvo: " + saveTo.getAbsolutePath() + saveTo.getName() + " ...");
+			
 			generarODT( Loader.getResourceAsStream( "resources/plantilla.odt" ), saveTo, root );
 			return true;
 		}catch( IOException e ){
