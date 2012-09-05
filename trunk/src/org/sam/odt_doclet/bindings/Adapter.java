@@ -270,4 +270,58 @@ public final class Adapter {
 		return toString( method.name(), method.parameters() );
 	}
 
+	private static String getComposeName( Class<?> clazz ){
+		Package pack = clazz.getPackage();
+		if( pack == null )
+			return clazz.getCanonicalName();
+		return clazz.getCanonicalName().substring( pack.getName().length() + 1 );
+	}
+
+	private static String getHierarchicalComposeName( Class<?> clazz ){
+		String name = getComposeName( clazz );
+		Class<?> superClass = clazz.getSuperclass();
+		while( superClass != null && !superClass.equals( Object.class )
+				&& clazz.getPackage().equals( superClass.getPackage() ) ){
+			name = getComposeName( superClass ) + '<' + name;
+			superClass = superClass.getSuperclass();
+		}
+		return name;
+	}
+	
+	/**
+	 * Método que genera una cadena de ordenación compuesta por:<br/>
+	 * |Nombre de Paquete|Codigo (interface, clase, enum)|[Nombre jerarquico de la clases contenedoras]|Nombre jerarquico de la clase
+	 * @param clazz
+	 * @return
+	 */
+	public static String getSortingName( Class<?> clazz ){
+		StringBuffer buff = new StringBuffer();
+		Package pack = clazz.getPackage();
+		if( pack != null ){
+			buff.append( pack.getName() );
+		}
+		
+		String name = getHierarchicalComposeName( clazz );
+		
+		Class<?> enclosingClass = clazz.getEnclosingClass();
+		while( enclosingClass != null ){
+			name = getHierarchicalComposeName( enclosingClass ) + ":" + name;
+			if ( enclosingClass.getEnclosingClass() == null )
+				clazz = enclosingClass;
+			enclosingClass = enclosingClass.getEnclosingClass();
+		}
+		if( clazz.isInterface() )
+			buff.append( "#0" );
+		else if( Exception.class.isAssignableFrom( clazz ) )
+			buff.append( "#1" );
+		else if( clazz.isEnum() )
+			buff.append( "#2" );
+		else
+			buff.append( "#3" );
+
+		buff.append( name );
+	
+		return buff.toString();
+	}
+	
 }
