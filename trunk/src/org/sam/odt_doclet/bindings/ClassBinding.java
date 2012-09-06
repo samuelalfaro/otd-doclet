@@ -43,6 +43,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.sam.odt_doclet.Graphic;
+import org.sam.odt_doclet.Visibility;
 
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.ConstructorDoc;
@@ -112,17 +113,6 @@ final class AssertHelper{
 final class Utils{
 	
 	private Utils(){}
-	
-	/**
-	 */
-	interface Filter <T>{
-		/**
-		 * Method validate.
-		 * @param t T
-		 * @return boolean
-		 */
-		boolean validate( T t );
-	}
 	
 	interface Taglet{
 		void apply( String text, StringBuilder builder );
@@ -477,9 +467,6 @@ final class Utils{
 	}
 	
 	private static final Comparator<FieldBinding> FieldComparator = new Comparator<FieldBinding>(){
-		/* (non-Javadoc)
-		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-		 */
 		@Override
 		public int compare( FieldBinding o1, FieldBinding o2 ){
 			if( o1.equals( o2 ) )
@@ -523,11 +510,7 @@ final class Utils{
 		return fields;
 	}
 	
-	
 	private static final Comparator<ConstructorBinding> ConstructorComparator = new Comparator<ConstructorBinding>(){
-		/* (non-Javadoc)
-		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-		 */
 		@Override
 		public int compare( ConstructorBinding o1, ConstructorBinding o2 ){
 			if( o1.equals( o2 ) )
@@ -575,9 +558,6 @@ final class Utils{
 	}
 	
 	private static final Comparator<MethodBinding> MethodComparator = new Comparator<MethodBinding>(){
-		/* (non-Javadoc)
-		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-		 */
 		@Override
 		public int compare( MethodBinding o1, MethodBinding o2 ){
 			if( o1.equals( o2 ) )
@@ -590,6 +570,11 @@ final class Utils{
 				return 1;
 			if( !Modifier.isAbstract( o1.modifiers ) && Modifier.isAbstract( o2.modifiers ) )
 				return -1;
+			//primero se comparan los nombres los nombres, y sólo en el caso de ser iguales,
+			//se evalúan los parámetros.
+			int compareNames = o1.name.compareTo( o2.name );
+			if( compareNames != 0 )
+				return compareNames;
 			return Adapter.toString( o1 ).compareTo( Adapter.toString( o2 ) ); 
 		}
 	};
@@ -686,73 +671,32 @@ final class Utils{
 	 * @return Collection<ExceptionBinding>
 	 */
 	static <T extends AccessibleObject & GenericDeclaration & Member> 
-	Collection<ExceptionBinding> getExceptions(T command, ExecutableMemberDoc doc ){
+Collection<ExceptionBinding> getExceptions( T command, ExecutableMemberDoc doc ){
 		
 		Type[] types = null;
-		if(command instanceof Constructor<?>)
-			types = ((Constructor<?>)command).getGenericExceptionTypes();
-		else if (command instanceof Method)
-			types =	((Method)command).getGenericExceptionTypes();
-		
-		if(types == null || types.length == 0)
+		if( command instanceof Constructor<?> )
+			types = ( (Constructor<?>)command ).getGenericExceptionTypes();
+		else if( command instanceof Method )
+			types = ( (Method)command ).getGenericExceptionTypes();
+
+		if( types == null || types.length == 0 )
 			return null;
-		
-		Collection<ExceptionBinding> exceptions= new ArrayDeque<ExceptionBinding>();
-		
-		if(doc == null)
-			for(Type type: types)
+
+		Collection<ExceptionBinding> exceptions = new ArrayDeque<ExceptionBinding>();
+
+		if( doc == null )
+			for( Type type: types )
 				exceptions.add( new ExceptionBinding( type ) );
-		else {
-			Map<String, ThrowsTag> map = new TreeMap<String, ThrowsTag>(Strings.CaseSensitiveComparator);
-			for(ThrowsTag e: doc.throwsTags())
+		else{
+			Map<String, ThrowsTag> map = new TreeMap<String, ThrowsTag>( Strings.CaseSensitiveComparator );
+			for( ThrowsTag e: doc.throwsTags() )
 				map.put( e.exceptionType().typeName(), e );
-			for(Type type: types)
-				exceptions.add( new ExceptionBinding( type, map.remove(Adapter.toString(type)) ) );
-			assert( map.size() == 0 ): "!!!Error en "+ command.getDeclaringClass() + ":\n\t" +
-				command.getName()+
-				AssertHelper.mostrar("Documentacion sobrante :", map.keySet());	
+			for( Type type: types )
+				exceptions.add( new ExceptionBinding( type, map.remove( Adapter.toString( type ) ) ) );
+			assert ( map.size() == 0 ): "!!!Error en " + command.getDeclaringClass() + ":\n\t" + command.getName()
+					+ AssertHelper.mostrar( "Documentacion sobrante :", map.keySet() );
 		}
 		return exceptions;
-	}
-}
-
-/**
- * 
- */
-enum Visibility{
-	
-	Public('+'),
-	Protected('#'),
-	Package('~'),
-	Private('-');
-	
-	/**
-	 * Method fromModifiers.
-	 * @param att int
-	 * @return Visibility
-	 */
-	public static Visibility fromModifiers(int att){
-		if( Modifier.isPublic(att) )
-			return Public;
-		if( Modifier.isProtected(att) )
-			return Protected;
-		if( Modifier.isPrivate(att) )
-			return Private;
-		return Package;
-	}
-	
-	private final char c;
-	
-	private Visibility(char c){
-		this.c = c;
-	}
-	
-	/**
-	 * Method toChar.
-	 * @return char
-	 */
-	public final char toChar(){
-		return c;
 	}
 }
 
@@ -982,34 +926,6 @@ class LinkBinding{
 
 /**
  */
-abstract class DocumentedElement {
-	
-	final String name;
-	final String documentation;
-	final Collection<LinkBinding> links;
-
-	/**
-	 * Constructor for DocumentedElement.
-	 * @param name String
-	 * @param doc Doc
-	 */
-	DocumentedElement( String name, Doc doc ){
-		this.name = name;
-		this.documentation = Utils.getDocumentation( doc );
-		this.links = Utils.getLinks( doc );
-	}
-
-	/**
-	 * Constructor for DocumentedElement.
-	 * @param name String
-	 */
-	DocumentedElement( String name ){
-		this( name, null );
-	}
-}
-
-/**
- */
 class ConstantBinding extends DocumentedElement{
 
 	/**
@@ -1100,7 +1016,7 @@ class ConstructorBinding extends CommandBinding{
 class MethodBinding extends CommandBinding{
 
 	private static MethodDoc checkOverride( MethodDoc doc ){
-		if( doc != null && doc.overriddenMethod() != null && doc.getRawCommentText().length() == 0 )
+		if( doc != null && doc.overriddenClass() != null && doc.getRawCommentText().length() == 0 )
 			doc.setRawCommentText( "@see " + doc.overriddenClass().qualifiedTypeName() + "#" + Adapter.toString( doc ) );
 		return doc;
 	}
@@ -1220,6 +1136,7 @@ public abstract class ClassBinding extends DocumentedElement{
 	};
 	
 	final String sortingName;
+	final String containingPackage;
 	
 	Graphic graphic;
 	
@@ -1236,7 +1153,12 @@ public abstract class ClassBinding extends DocumentedElement{
 	 */
 	ClassBinding( Class<?> clazz, ClassDoc classDoc ){
 		super( Adapter.toString( clazz ), classDoc );
+		containingPackage = classDoc.containingPackage().name();
 		sortingName = Adapter.getSortingName( clazz );
+	}
+	
+	public String getPackage(){
+		return containingPackage;
 	}
 	
 	public void setGraphic( Graphic graphic ){

@@ -21,7 +21,8 @@
  */
 package org.sam.odt_doclet.bindings;
 
-import org.sam.odt_doclet.bindings.Visibility;
+import org.sam.odt_doclet.Visibility;
+
 
 /**
  */
