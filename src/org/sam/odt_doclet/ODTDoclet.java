@@ -51,6 +51,7 @@ import org.sam.odt_doclet.UnitsDimension.Units;
 import org.sam.odt_doclet.bindings.ClassBinding;
 import org.sam.odt_doclet.bindings.ClassBindingFactory;
 import org.sam.odt_doclet.bindings.Recorders;
+import org.sam.odt_doclet.bindings.VisibilityFilters;
 import org.sam.odt_doclet.graphics.BulletGenerator;
 import org.sam.odt_doclet.graphics.UMLDiagramGenerator;
 import org.sam.xml.XMLConverter;
@@ -187,11 +188,11 @@ public final class ODTDoclet{
 		System.out.println( "Generando diagramas UML..." );
 		for( ClassDoc classDoc: root.classes() )
 			try{
+				System.out.println( classDoc.qualifiedName() );
 				ClassBinding clazz = ClassBindingFactory.createBinding( classDoc );
 				
 				String pictName = classDoc.qualifiedName();
 				String pictPath = "Pictures/" + pictName + ".png";
-				System.out.println( pictName );
 				
 				out.putNextEntry( new ZipEntry( pictPath ) );
 					manifest.addImage( pictPath );
@@ -214,11 +215,19 @@ public final class ODTDoclet{
 		
 		System.out.println( "Generando texto..." );
 		ODTHelper.beginDocumenContent( writer );
+		
+		ClassBinding lastClazz = null;
 		for( ClassBinding clazz: classes ){
-			System.out.println( clazz );
+			if( lastClazz == null || !lastClazz.getPackage().equals( clazz.getPackage() ) ){
+				writer.openNode( "text:h" );
+					writer.addAttribute( "text:style-name", "Heading_20_1" );
+					writer.addAttribute( "text:outline-level", 1 );
+					writer.write( clazz.getPackage() != null ? clazz.getPackage() : "(default  package)" );
+				writer.closeNode();
+			}
 			converter.write( clazz );
+			lastClazz =clazz;
 		}
-
 		ODTHelper.endDocumenContent( writer );
 
 		out.putNextEntry( new ZipEntry( "META-INF/manifest.xml" ) );
@@ -233,16 +242,38 @@ public final class ODTDoclet{
 	 */
 	public static boolean start( RootDoc root ){
 		System.out.println("Generando documentación...");
+		/*
+		for( String[] option: root.options() ){
+			if( option.length > 0 ){
+				System.out.print( option[0] + "\t" );
+			}
+			if( option.length > 1 ){
+				int i = 1;
+				while( true ){
+					System.out.print( option[i] );
+					if( ++i < option.length )
+						System.out.print( " " );
+					else{
+						System.out.println();
+						break;
+					}
+				}
+			}
+		}
+		return true;
+		/*/
+		
+		VisibilityFilters.setVisibility( Visibility.Package );
+		
 		try{
-			
 			JFileChooser chooser = new JFileChooser();
 			
 			chooser.setCurrentDirectory( new File( "." ) );
 			chooser.setSelectedFile( new File( "odt-doclet.conf" ) );
 			chooser.setFileFilter( new FileNameExtensionFilter( "Archivos configuarción", "conf", "ini", "properties" ) );
 			chooser.setDialogTitle( "Indique la ubicación del archivo de configuración" );
+			Properties properties = new Properties();
 			if( chooser.showOpenDialog( null ) == JFileChooser.APPROVE_OPTION ){
-				Properties properties = new Properties();
 				try{
 					properties.load( new FileInputStream( chooser.getSelectedFile().getCanonicalFile() ) );
 					ClassBindingFactory.setClassLoader( ClassLoaderTools.getLoader(
@@ -272,8 +303,10 @@ public final class ODTDoclet{
 					return false;
 			}
 			System.out.println("Creando archvo: " + saveTo.getAbsolutePath() + saveTo.getName() + " ...");
-			
-			generarODT( Loader.getResourceAsStream( "resources/plantilla.odt" ), saveTo, root );
+			String templatePath = properties.getProperty( "templatePath" );
+			if( templatePath == null || templatePath.length() == 0 )
+				templatePath = "resources/plantilla.odt";
+			generarODT( Loader.getResourceAsStream( templatePath ), saveTo, root );
 			return true;
 		}catch( IOException e ){
 			e.printStackTrace();
@@ -282,5 +315,6 @@ public final class ODTDoclet{
 			e.printStackTrace();
 			return false;
 		}
+		//*/
 	}
 }

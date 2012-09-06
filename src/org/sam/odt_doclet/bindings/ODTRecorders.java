@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import org.htmlcleaner.ContentNode;
 import org.htmlcleaner.TagNode;
@@ -261,38 +263,80 @@ final class ODTRecorders extends Recorders{
 		}
 	}
 	
-	static void writeTitle( String title, String styleTitle, int level, XMLWriter writer ) throws IOException{
-		writer.openNode( "text:h" );
-			writer.addAttribute( "text:style-name", styleTitle );
-			writer.addAttribute( "text:outline-level", level );
-			writer.write( title );
-		writer.closeNode();
-	}
-	
-	
-	static <T> void writeCollection( String title, String styleTitle, int level, Collection<T> collection, XMLWriter writer, RecordersMapper mapper ) throws IOException{
-		if( collection != null && collection.size() > 0 ){
-			writeTitle( title, styleTitle, level, writer );
-			for( T t: collection )
-				mapper.getRecorder( t.getClass() ).record( t, writer, mapper );
+	static void writeTitle( String style, String content, XMLWriter writer ) throws IOException{
+		if( content != null && content.length() > 0 ){
+			writer.openNode( "text:p" );
+				writer.addAttribute( "text:style-name", style );
+				writer.write( content );
+			writer.closeNode();
 		}
 	}
 	
-	static <T> void writeCollection( String title, String styleTitle, int level, Collection<T> collection, String styleCollection, XMLWriter writer, RecordersMapper mapper ) throws IOException{
+	static void writeTitle( String style, int level, String content, XMLWriter writer ) throws IOException{
+		if( content != null && content.length() > 0 ){
+			writer.openNode( "text:h" );
+				writer.addAttribute( "text:style-name", style );
+				writer.addAttribute( "text:outline-level", level );
+				writer.write( content );
+			writer.closeNode();
+		}
+	}
+	
+	static <T> Collection<T> filterCollection( Filter<? super T> filter, Collection<T> collection ){
+		if( collection == null || collection.size() == 0 )
+			return collection;
+		Queue<T> out = new LinkedList<T>();
+		for( T t: collection )
+			if( filter.validate( t ))
+				out.offer( t );
+		return out;
+	}
+	
+	static <T> void writeCollection( Collection<T> collection, XMLWriter writer, RecordersMapper mapper ) throws IOException{
+		for( T t: collection )
+			mapper.getRecorder( t.getClass() ).record( t, writer, mapper );
+	}
+	
+	static <T> void writeCollection( String style, Collection<T> collection, XMLWriter writer, RecordersMapper mapper ) throws IOException{
+		writer.openNode( "text:p" );
+			writer.addAttribute( "text:style-name", style );
+			Iterator<T> it = collection.iterator();
+			do{
+				T t = it.next();
+				mapper.getRecorder( t.getClass() ).record( t, writer, mapper );
+				if( it.hasNext() )
+					writer.emptyNode( "text:line-break" );
+				else
+					break;
+			}while( true );
+		writer.closeUntilParent("text:p");
+	}
+	
+	static <T> void writeTitleCollection( String styleTitle, String title, Collection<T> collection, XMLWriter writer, RecordersMapper mapper ) throws IOException{
 		if( collection != null && collection.size() > 0 ){
-			writeTitle( title, styleTitle, level, writer );
-			writer.openNode( "text:p" );
-				writer.addAttribute( "text:style-name", styleCollection );
-				Iterator<T> it = collection.iterator();
-				do{
-					T t = it.next();
-					mapper.getRecorder( t.getClass() ).record( t, writer, mapper );
-					if( it.hasNext() )
-						writer.emptyNode( "text:line-break" );
-					else
-						break;
-				}while( true );
-			writer.closeUntilParent("text:p");
+			writeTitle( styleTitle, title, writer );
+			writeCollection( collection, writer, mapper );
+		}
+	}
+	
+	static <T> void writeTitleCollection( String styleTitle, String title, String styleCollection, Collection<T> collection, XMLWriter writer, RecordersMapper mapper ) throws IOException{
+		if( collection != null && collection.size() > 0 ){
+			writeTitle( styleTitle, title, writer );
+			writeCollection( styleCollection, collection, writer, mapper );
+		}
+	}
+	
+	static <T> void writeTitleCollection( String styleTitle, int level, String title, Collection<T> collection, XMLWriter writer, RecordersMapper mapper ) throws IOException{
+		if( collection != null && collection.size() > 0 ){
+			writeTitle( styleTitle, level, title, writer );
+			writeCollection( collection, writer, mapper );
+		}
+	}
+	
+	static <T> void writeTitleCollection( String styleTitle, int level, String title, String styleCollection, Collection<T> collection, XMLWriter writer, RecordersMapper mapper ) throws IOException{
+		if( collection != null && collection.size() > 0 ){
+			writeTitle( styleTitle, level, title, writer );
+			writeCollection( styleCollection, collection, writer, mapper );
 		}
 	}
 	
@@ -378,11 +422,11 @@ final class ODTRecorders extends Recorders{
 			writer.closeNode();
 			if( t.documentation != null && t.documentation.length() > 0 ){
 				writer.openNode( "text:p" );
-					writer.addAttribute( "text:style-name", "Standard" );
+					writer.addAttribute( "text:style-name", "Estilo1" );
 					FORMATER.format( t.documentation, writer );
 				writer.closeUntilParent("text:p");
 			}
-			writeCollection( "Mire También:", "Heading_20_5", 5, t.links, "Standard", writer, mapper );
+			writeTitleCollection( "TituloDestacado", "Mire También:", "Estilo2", t.links, writer, mapper );
 		}
 	}
 
@@ -408,11 +452,11 @@ final class ODTRecorders extends Recorders{
 			writer.closeNode();
 			if( t.documentation != null && t.documentation.length() > 0 ){
 				writer.openNode( "text:p" );
-					writer.addAttribute( "text:style-name", "Standard" );
+					writer.addAttribute( "text:style-name", "Estilo1" );
 					FORMATER.format( t.documentation, writer );
 				writer.closeUntilParent("text:p");
 			}
-			writeCollection( "Mire También:", "Heading_20_5", 5, t.links, "Standard", writer, mapper );
+			writeTitleCollection( "TituloDestacado", "Mire También:", "Estilo2", t.links, writer, mapper );
 		}
 	}
 
@@ -431,11 +475,11 @@ final class ODTRecorders extends Recorders{
 				writeBullet( t, "14", "14", "pt", writer );
 				writer.write( t.name );
 			writer.closeNode();
-			insertParagraph( "Estilo", t.documentation, writer );
-			writeCollection( "Tipos Parametizados:", "Heading_20_5", 5, t.typeParams, "Standard", writer, mapper );
-			writeCollection( "Parámetros:", "Heading_20_5", 5, t.params, "Standard", writer, mapper );
-			writeCollection( "Lanza:", "Heading_20_5", 5, t.exceptions, "Standard", writer, mapper );
-			writeCollection( "Mire También:", "Heading_20_5", 5, t.links, "Standard", writer, mapper );
+			insertParagraph( "Estilo1", t.documentation, writer );
+			writeTitleCollection( "TituloDestacado", "Tipos Parametizados:", "Estilo2", t.typeParams, writer, mapper );
+			writeTitleCollection( "TituloDestacado", "Parámetros:", "Estilo2", t.params, writer, mapper );
+			writeTitleCollection( "TituloDestacado", "Lanza:", "Estilo2", t.exceptions, writer, mapper );
+			writeTitleCollection( "TituloDestacado", "Mire También:", "Estilo2", t.links, writer, mapper );
 		}
 	}
 
@@ -454,25 +498,26 @@ final class ODTRecorders extends Recorders{
 				writeBullet( t, "14", "14", "pt", writer );
 				writer.write( t.name );
 			writer.closeNode();
-			insertParagraph( "Estilo", t.documentation, writer );
-			writeCollection( "Tipos Parametizados:", "Heading_20_5", 5, t.typeParams, "Standard", writer, mapper );
-			writeCollection( "Parámetros:", "Heading_20_5", 5, t.params, "Standard", writer, mapper );
+			insertParagraph( "Estilo1", t.documentation, writer );
+			
+			writeTitleCollection( "TituloDestacado", "Tipos Parametizados:", "Estilo2", t.typeParams, writer, mapper );
+			writeTitleCollection( "TituloDestacado", "Parámetros:", "Estilo2", t.params, writer, mapper );
 			if( t.returnType != null ){
-				writer.openNode( "text:h" );
-					writer.addAttribute( "text:style-name", "Heading_20_5" );
-					writer.addAttribute( "text:outline-level", 5 );
+				writer.openNode( "text:p" );
+					writer.addAttribute( "text:style-name", "TituloDestacado" );
 					writer.write( "Devuelve:" );
 				writer.closeNode();
 				writer.openNode( "text:p" );
-					writer.addAttribute( "text:style-name", "Standard" );
+					writer.addAttribute( "text:style-name", "Estilo2" );
 					mapper.getRecorder( ReturnTypeBinding.class ).record( t.returnType, writer, mapper );
 				writer.closeUntilParent( "text:p" );
 			}
-			writeCollection( "Lanza:", "Heading_20_5", 5, t.exceptions, "Standard", writer, mapper );
-			writeCollection( "Mire También:", "Heading_20_5", 5, t.links, "Standard", writer, mapper );
+			writeTitleCollection( "TituloDestacado", "Lanza:", "Estilo2", t.exceptions, writer, mapper );
+			writeTitleCollection( "TituloDestacado", "Mire También:", "Estilo2", t.links, writer, mapper );
 		}
 	}
 
+	
 	private static class InterfaceRecorder implements Recorder<ClassBinding.Interface>{
 		
 		InterfaceRecorder(){}
@@ -493,11 +538,11 @@ final class ODTRecorders extends Recorders{
 					ODTHelper.insertImage( writer, "Graphics", t.graphic );
 				writer.closeNode();
 			}
-			writeCollection( "Parámetros:", "Heading_20_5", 5, t.parameters, "Standard", writer, mapper );
-			insertParagraph( "Standard", t.documentation, writer );
-			writeCollection( "Mire También:", "Heading_20_5", 5, t.links, "Standard", writer, mapper );
-			writeCollection( "Atributos:", "Heading_20_3", 3, t.fields, writer, mapper );
-			writeCollection( "Métodos:", "Heading_20_3", 3, t.methods, writer, mapper );
+			writeTitleCollection( "TituloDestacado", "Parámetros:", "Estilo2", t.parameters, writer, mapper );
+			insertParagraph( "Estilo1", t.documentation, writer );
+			writeTitleCollection( "TituloDestacado", "Mire También:", "Estilo2", t.links, writer, mapper );
+			writeTitleCollection( "Heading_20_3", 3, "Atributos:",  t.fields, writer, mapper );
+			writeTitleCollection( "Heading_20_3", 3, "Métodos:",  t.methods, writer, mapper );
 		}
 	}
 
@@ -523,12 +568,15 @@ final class ODTRecorders extends Recorders{
 					ODTHelper.insertImage( writer, "Graphics", t.graphic );
 				writer.closeNode();
 			}
-			insertParagraph( "Standard", t.documentation, writer );
-			writeCollection( "Mire También:", "Heading_20_5", 5, t.links, "Standard", writer, mapper );
-			writeCollection( "Constantes:", "Heading_20_3", 3, t.constants, writer, mapper );
-			writeCollection( "Atributos:", "Heading_20_3", 3, t.fields, writer, mapper );
-			writeCollection( "Constructores:", "Heading_20_3", 3, t.constructors, writer, mapper );
-			writeCollection( "Métodos:", "Heading_20_3", 3, t.methods, writer, mapper );
+			insertParagraph( "Estilo1", t.documentation, writer );
+			writeTitleCollection( "TituloDestacado", "Mire También:", "Estilo2", t.links, writer, mapper );
+			writeTitleCollection( "Heading_20_3", 3, "Constantes:",  t.constants, writer, mapper );
+			writeTitleCollection( "Heading_20_3", 3, "Atributos:",
+					filterCollection( VisibilityFilters.FieldFilter, t.fields ), writer, mapper );
+			writeTitleCollection( "Heading_20_3", 3, "Constructores:",
+					filterCollection( VisibilityFilters.CommandFilter, t.constructors ), writer, mapper );
+			writeTitleCollection( "Heading_20_3", 3, "Métodos:",
+					filterCollection( VisibilityFilters.CommandFilter, t.methods ), writer, mapper );
 		}
 	}
 
@@ -554,12 +602,15 @@ final class ODTRecorders extends Recorders{
 					ODTHelper.insertImage( writer, "Graphics", t.graphic );
 				writer.closeNode();
 			}
-			writeCollection( "Parámetros:", "Heading_20_5", 5, t.parameters, "Standard", writer, mapper );
-			insertParagraph( "Standard", t.documentation, writer );
-			writeCollection( "Mire También:", "Heading_20_5", 5, t.links, "Standard", writer, mapper );
-			writeCollection( "Atributos:", "Heading_20_3", 3, t.fields, writer, mapper );
-			writeCollection( "Constructores:", "Heading_20_3", 3, t.constructors, writer, mapper );
-			writeCollection( "Métodos:", "Heading_20_3", 3, t.methods, writer, mapper );
+			writeTitleCollection( "TituloDestacado", "Parámetros:", "Estilo2", t.parameters, writer, mapper );
+			insertParagraph( "Estilo1", t.documentation, writer );
+			writeTitleCollection( "TituloDestacado", "Mire También:", "Estilo2", t.links, writer, mapper );
+			writeTitleCollection( "Heading_20_3", 3, "Atributos:",
+					filterCollection( VisibilityFilters.FieldFilter, t.fields ), writer, mapper );
+			writeTitleCollection( "Heading_20_3", 3, "Constructores:",
+					filterCollection( VisibilityFilters.CommandFilter, t.constructors ), writer, mapper );
+			writeTitleCollection( "Heading_20_3", 3, "Métodos:",
+					filterCollection( VisibilityFilters.CommandFilter, t.methods ), writer, mapper );
 		}
 	}
 	
