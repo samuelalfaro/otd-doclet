@@ -220,8 +220,8 @@ public final class ODTDoclet{
 		for( ClassBinding clazz: classes ){
 			if( lastClazz == null || !lastClazz.getPackage().equals( clazz.getPackage() ) ){
 				writer.openNode( "text:h" );
-					writer.addAttribute( "text:style-name", "Heading_20_1" );
-					writer.addAttribute( "text:outline-level", 1 );
+					writer.addAttribute( "text:style-name", "HDoclet1" );
+					writer.addAttribute( "text:outline-level", 3 );
 					writer.write( clazz.getPackage() != null ? clazz.getPackage() : "(default  package)" );
 				writer.closeNode();
 			}
