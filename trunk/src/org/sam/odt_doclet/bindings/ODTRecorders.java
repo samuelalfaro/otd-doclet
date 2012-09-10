@@ -482,8 +482,8 @@ final class ODTRecorders extends Recorders{
 		@Override
 		public void record( ConstantBinding t, XMLWriter writer, RecordersMapper mapper ) throws IOException{
 			writer.openNode( "text:h" );
-				writer.addAttribute( "text:style-name", "Heading_20_4" );
-				writer.addAttribute( "text:outline-level", 4 );
+				writer.addAttribute( "text:style-name", "HDoclet4" );
+				writer.addAttribute( "text:outline-level", 6 );
 				writeConstantBullet( "14", "14", "pt", writer );
 				writer.openNode( "text:span" );
 					writer.addAttribute( "text:style-name", "AutoStyleB" );
@@ -496,7 +496,7 @@ final class ODTRecorders extends Recorders{
 					FORMATER.format( t.documentation, writer );
 				writer.closeUntilParent("text:p");
 			}
-			writeTitleCollection( "TituloDestacado", "Mire También:", "Estilo2", t.links, writer, mapper );
+			writeTitleCollection( "Enfatizado", "Mire También:", "Estilo2", t.links, writer, mapper );
 		}
 	}
 
@@ -510,8 +510,8 @@ final class ODTRecorders extends Recorders{
 		@Override
 		public void record( FieldBinding t, XMLWriter writer, RecordersMapper mapper ) throws IOException{
 			writer.openNode( "text:h" );
-			writer.addAttribute( "text:style-name", "Heading_20_4" );
-				writer.addAttribute( "text:outline-level", 4 );
+			writer.addAttribute( "text:style-name", "HDoclet4" );
+				writer.addAttribute( "text:outline-level", 6 );
 				writeBullet( t, "14", "14", "pt", writer );
 				writer.openNode( "text:span" );
 					writer.addAttribute( "text:style-name", "AutoStyleB" );
@@ -526,7 +526,7 @@ final class ODTRecorders extends Recorders{
 					FORMATER.format( t.documentation, writer );
 				writer.closeUntilParent("text:p");
 			}
-			writeTitleCollection( "TituloDestacado", "Mire También:", "Estilo2", t.links, writer, mapper );
+			writeTitleCollection( "Enfatizado", "Mire También:", "Estilo2", t.links, writer, mapper );
 		}
 	}
 
@@ -540,16 +540,16 @@ final class ODTRecorders extends Recorders{
 		@Override
 		public void record( ConstructorBinding t, XMLWriter writer, RecordersMapper mapper ) throws IOException{
 			writer.openNode( "text:h" );
-				writer.addAttribute( "text:style-name", "Heading_20_4" );
-				writer.addAttribute( "text:outline-level", 4 );
+				writer.addAttribute( "text:style-name", "HDoclet4" );
+				writer.addAttribute( "text:outline-level", 6 );
 				writeBullet( t, "14", "14", "pt", writer );
 				writer.write( t.name );
 			writer.closeNode();
 			insertParagraph( "Estilo1", t.documentation, writer );
-			writeTitleCollection( "TituloDestacado", "Tipos Parametizados:", "Estilo2", t.typeParams, writer, mapper );
-			writeTitleCollection( "TituloDestacado", "Parámetros:", "Estilo2", t.params, writer, mapper );
-			writeTitleCollection( "TituloDestacado", "Lanza:", "Estilo2", t.exceptions, writer, mapper );
-			writeTitleCollection( "TituloDestacado", "Mire También:", "Estilo2", t.links, writer, mapper );
+			writeTitleCollection( "Enfatizado", "Tipos Parametizados:", "Estilo2", t.typeParams, writer, mapper );
+			writeTitleCollection( "Enfatizado", "Parámetros:", "Estilo2", t.params, writer, mapper );
+			writeTitleCollection( "Enfatizado", "Lanza:", "Estilo2", t.exceptions, writer, mapper );
+			writeTitleCollection( "Enfatizado", "Mire También:", "Estilo2", t.links, writer, mapper );
 		}
 	}
 
@@ -563,18 +563,18 @@ final class ODTRecorders extends Recorders{
 		@Override
 		public void record( MethodBinding t, XMLWriter writer, RecordersMapper mapper ) throws IOException{
 			writer.openNode( "text:h" );
-				writer.addAttribute( "text:style-name", "Heading_20_4" );
-				writer.addAttribute( "text:outline-level", 4 );
+				writer.addAttribute( "text:style-name", "HDoclet4" );
+				writer.addAttribute( "text:outline-level", 6 );
 				writeBullet( t, "14", "14", "pt", writer );
 				writer.write( t.name );
 			writer.closeNode();
 			insertParagraph( "Estilo1", t.documentation, writer );
 			
-			writeTitleCollection( "TituloDestacado", "Tipos Parametizados:", "Estilo2", t.typeParams, writer, mapper );
-			writeTitleCollection( "TituloDestacado", "Parámetros:", "Estilo2", t.params, writer, mapper );
+			writeTitleCollection( "Enfatizado", "Tipos Parametizados:", "Estilo2", t.typeParams, writer, mapper );
+			writeTitleCollection( "Enfatizado", "Parámetros:", "Estilo2", t.params, writer, mapper );
 			if( t.returnType != null ){
 				writer.openNode( "text:p" );
-					writer.addAttribute( "text:style-name", "TituloDestacado" );
+					writer.addAttribute( "text:style-name", "Enfatizado" );
 					writer.write( "Devuelve:" );
 				writer.closeNode();
 				writer.openNode( "text:p" );
@@ -582,8 +582,8 @@ final class ODTRecorders extends Recorders{
 					mapper.getRecorder( ReturnTypeBinding.class ).record( t.returnType, writer, mapper );
 				writer.closeUntilParent( "text:p" );
 			}
-			writeTitleCollection( "TituloDestacado", "Lanza:", "Estilo2", t.exceptions, writer, mapper );
-			writeTitleCollection( "TituloDestacado", "Mire También:", "Estilo2", t.links, writer, mapper );
+			writeTitleCollection( "Enfatizado", "Lanza:", "Estilo2", t.exceptions, writer, mapper );
+			writeTitleCollection( "Enfatizado", "Mire También:", "Estilo2", t.links, writer, mapper );
 		}
 	}
 
@@ -598,21 +598,21 @@ final class ODTRecorders extends Recorders{
 		@Override
 		public void record( ClassBinding.Interface t, XMLWriter writer, RecordersMapper mapper ) throws IOException{
 			writer.openNode( "text:h" );
-				writer.addAttribute( "text:style-name", "Encabezado_20_2_20_Interface" );
-				writer.addAttribute( "text:outline-level", 2 );
+				writer.addAttribute( "text:style-name", "HDoclet2I" );
+				writer.addAttribute( "text:outline-level", 4 );
 				writer.write( "Interface: " + t.name );
 			writer.closeNode();
 			if( t.graphic != null ){
 				writer.openNode( "text:p" );
-					writer.addAttribute( "text:style-name", "Standard" );	
+					writer.addAttribute( "text:style-name", "Diagrama" );	
 					ODTHelper.insertImage( writer, "Graphics", t.graphic );
 				writer.closeNode();
 			}
-			writeTitleCollection( "TituloDestacado", "Parámetros:", "Estilo2", t.parameters, writer, mapper );
+			writeTitleCollection( "Enfatizado", "Parámetros:", "Estilo2", t.parameters, writer, mapper );
 			insertParagraph( "Estilo1", t.documentation, writer );
-			writeTitleCollection( "TituloDestacado", "Mire También:", "Estilo2", t.links, writer, mapper );
-			writeTitleCollection( "Heading_20_3", 3, "Atributos:",  t.fields, writer, mapper );
-			writeTitleCollection( "Heading_20_3", 3, "Métodos:",  t.methods, writer, mapper );
+			writeTitleCollection( "Enfatizado", "Mire También:", "Estilo2", t.links, writer, mapper );
+			writeTitleCollection( "HDoclet3", 5, "Atributos:",  t.fields, writer, mapper );
+			writeTitleCollection( "HDoclet3", 5, "Métodos:",  t.methods, writer, mapper );
 		}
 	}
 
@@ -628,24 +628,24 @@ final class ODTRecorders extends Recorders{
 		@Override
 		public void record( ClassBinding.Enum t, XMLWriter writer, RecordersMapper mapper ) throws IOException{
 			writer.openNode( "text:h" );
-				writer.addAttribute( "text:style-name", "Encabezado_20_2_20_Enumeracion" );
-				writer.addAttribute( "text:outline-level", 2 );
+				writer.addAttribute( "text:style-name", "HDoclet2E" );
+				writer.addAttribute( "text:outline-level", 4 );
 				writer.write( "Enumeración: " + t.name );
 			writer.closeNode();
 			if( t.graphic != null ){
 				writer.openNode( "text:p" );
-					writer.addAttribute( "text:style-name", "Standard" );	
+					writer.addAttribute( "text:style-name", "Diagrama" );	
 					ODTHelper.insertImage( writer, "Graphics", t.graphic );
 				writer.closeNode();
 			}
 			insertParagraph( "Estilo1", t.documentation, writer );
-			writeTitleCollection( "TituloDestacado", "Mire También:", "Estilo2", t.links, writer, mapper );
-			writeTitleCollection( "Heading_20_3", 3, "Constantes:",  t.constants, writer, mapper );
-			writeTitleCollection( "Heading_20_3", 3, "Atributos:",
+			writeTitleCollection( "Enfatizado", "Mire También:", "Estilo2", t.links, writer, mapper );
+			writeTitleCollection( "HDoclet3", 5, "Constantes:",  t.constants, writer, mapper );
+			writeTitleCollection( "HDoclet3", 5, "Atributos:",
 					filterCollection( VisibilityFilters.FieldFilter, t.fields ), writer, mapper );
-			writeTitleCollection( "Heading_20_3", 3, "Constructores:",
+			writeTitleCollection( "HDoclet3", 5, "Constructores:",
 					filterCollection( VisibilityFilters.CommandFilter, t.constructors ), writer, mapper );
-			writeTitleCollection( "Heading_20_3", 3, "Métodos:",
+			writeTitleCollection( "HDoclet3", 5, "Métodos:",
 					filterCollection( VisibilityFilters.CommandFilter, t.methods ), writer, mapper );
 		}
 	}
@@ -662,24 +662,24 @@ final class ODTRecorders extends Recorders{
 		@Override
 		public void record( ClassBinding.Clazz t, XMLWriter writer, RecordersMapper mapper ) throws IOException{
 			writer.openNode( "text:h" );
-				writer.addAttribute( "text:style-name", "Encabezado_20_2_20_Clase" );
-				writer.addAttribute( "text:outline-level", 2 );
+				writer.addAttribute( "text:style-name", "HDoclet2C" );
+				writer.addAttribute( "text:outline-level", 4 );
 				writer.write( "Clase: " + t.name );
 			writer.closeNode();
 			if( t.graphic != null ){
 				writer.openNode( "text:p" );
-					writer.addAttribute( "text:style-name", "Standard" );	
+					writer.addAttribute( "text:style-name", "Diagrama" );	
 					ODTHelper.insertImage( writer, "Graphics", t.graphic );
 				writer.closeNode();
 			}
-			writeTitleCollection( "TituloDestacado", "Parámetros:", "Estilo2", t.parameters, writer, mapper );
+			writeTitleCollection( "Enfatizado", "Parámetros:", "Estilo2", t.parameters, writer, mapper );
 			insertParagraph( "Estilo1", t.documentation, writer );
-			writeTitleCollection( "TituloDestacado", "Mire También:", "Estilo2", t.links, writer, mapper );
-			writeTitleCollection( "Heading_20_3", 3, "Atributos:",
+			writeTitleCollection( "Enfatizado", "Mire También:", "Estilo2", t.links, writer, mapper );
+			writeTitleCollection( "HDoclet3", 5, "Atributos:",
 					filterCollection( VisibilityFilters.FieldFilter, t.fields ), writer, mapper );
-			writeTitleCollection( "Heading_20_3", 3, "Constructores:",
+			writeTitleCollection( "HDoclet3", 5, "Constructores:",
 					filterCollection( VisibilityFilters.CommandFilter, t.constructors ), writer, mapper );
-			writeTitleCollection( "Heading_20_3", 3, "Métodos:",
+			writeTitleCollection( "HDoclet3", 5, "Métodos:",
 					filterCollection( VisibilityFilters.CommandFilter, t.methods ), writer, mapper );
 		}
 	}
