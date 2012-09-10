@@ -37,6 +37,7 @@ import org.sam.odt_doclet.ODTHelper;
 import org.sam.odt_doclet.ODTHelper.TextStyleProperties;
 import org.sam.xml.Recorder;
 import org.sam.xml.RecordersMapper;
+import org.sam.xml.StringDigester;
 import org.sam.xml.XMLConverter;
 import org.sam.xml.XMLWriter;
 
@@ -58,6 +59,70 @@ final class ODTRecorders extends Recorders{
 	}
 	
 	static final HTMLFormater FORMATER = new Cleaner( new HTMLSerializer(){
+		
+		StringDigester preDigester = new StringDigester(){
+
+			private final char[] charArray = new char[8192];
+
+			public void digestString( String content, Appendable out ) throws IOException{
+
+				int remainder = content.length();
+				int srcBegin = 0;
+
+				while( remainder > 0 ){
+					int copiedChars = Math.min( remainder, charArray.length );
+					content.getChars( srcBegin, srcBegin + copiedChars, charArray, 0 );
+					for( int i = 0; i < copiedChars; i++ )
+						switch( charArray[i] ){
+						case '&':
+							out.append( "&amp;" );
+							break;
+						case '<':
+							out.append( "&lt;" );
+							break;
+						case '>':
+							out.append( "&gt;" );
+							break;
+						case '\"':
+							out.append( "&quot;" );
+							break;
+						case '\'':
+							out.append( "&apos;" );
+							break;
+						case ' ':
+							//*
+							out.append( "<text:s/>" );
+							/*/
+							//TODO hacer
+							if( i + 1 < copiedChars && charArray[i + 1] != ' ' )
+								out.append( ' ' );
+							else{
+								out.append( "<text:s " );
+								int n = 1;
+								i++;
+								while( i < copiedChars && charArray[i] != ' ' ){
+									n++;
+									i++;
+								}
+								out.append( "text:c=\"" + n + "\"/>" );
+							}
+							//*/
+							break;
+						case '\t':
+							out.append( "<text:tab/>" );
+							break;
+						case '\n':
+							out.append( "<text:line-break/>" );
+							break;
+
+						default:
+							out.append( charArray[i] );
+						}
+					remainder -= copiedChars;
+				}
+			}
+		};
+
 		
 		TextStyleProperties properties = new TextStyleProperties();
 		
@@ -166,6 +231,11 @@ final class ODTRecorders extends Recorders{
 					}else if( nodeName.equalsIgnoreCase( "li" ) ){
 						writer.openNode( "text:list-item" );
 							serialize( tagNode, writer );
+						writer.closeNode();
+					}else if( nodeName.equalsIgnoreCase( "pre" ) ){
+						writer.openNode( "text:span" );
+							writer.addAttribute( "text:style-name", "AutoStyleM" );
+							writer.write( tagNode.getText().toString(), preDigester );
 						writer.closeNode();
 					}else{
 						if( tagNode.getChildren().size() == 0 )
