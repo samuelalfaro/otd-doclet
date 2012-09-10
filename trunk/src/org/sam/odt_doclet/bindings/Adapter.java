@@ -112,7 +112,7 @@ public final class Adapter {
 			return toString( ( (GenericArrayType)type ).getGenericComponentType() ) + "[]";
 		if( type instanceof WildcardType )
 			return toString( (WildcardType)type );
-		// Cuando no se especifique explicitamente toString(? typeVariable)):
+		// Cuando no se especifique explicitamente toString(? typeVariable):
 		// TypeVariable<?> tv = < T extends A & B & C >
 		// Type ty = tv
 		// toString(tv) --> T extends A & B & C

@@ -32,6 +32,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Deque;
@@ -546,8 +547,10 @@ final class Utils{
 						doc = map.remove( Adapter.toString( constructor, true ) );
 					if( doc != null )
 						constructors.add( new ConstructorBinding( constructor, doc ) );
-					else
+					else{
+						constructors.add( new ConstructorBinding( constructor, null ) );
 						undocumented.add( Adapter.toString( constructor ) );
+					}
 				}
 			}
 			assert ( map.size() == 0 ): "!!!Error en " + classDoc.name() + ":\n"
@@ -578,6 +581,8 @@ final class Utils{
 			return Adapter.toString( o1 ).compareTo( Adapter.toString( o2 ) ); 
 		}
 	};
+	
+	
 	
 	/**
 	 * Method getMethods.
@@ -612,8 +617,10 @@ final class Utils{
 					MethodDoc doc = map.remove( Adapter.toString( method ) );
 					if( doc != null )
 						methods.add( new MethodBinding( method, doc ) );
-					else
+					else{
+						methods.add( new MethodBinding( method, null ) );
 						undocumented.add( Adapter.toString( method ) );
+					}
 				}
 			}
 			assert ( map.size() == 0 ): "!!!Error en " + classDoc.name() + ":\n"
@@ -1015,6 +1022,19 @@ class ConstructorBinding extends CommandBinding{
  */
 class MethodBinding extends CommandBinding{
 
+	private static boolean isMethodOverrriden( Method method ){
+		Class<?> declaringClass = method.getDeclaringClass();
+		if( declaringClass.equals( Object.class ) ){
+			return false;
+		}
+		try{
+			declaringClass.getSuperclass().getMethod( method.getName(), method.getParameterTypes() );
+			return true;
+		}catch( NoSuchMethodException e ){
+			return false;
+		}
+	}
+	
 	private static MethodDoc checkOverride( MethodDoc doc ){
 		if( doc != null && doc.overriddenClass() != null && doc.getRawCommentText().length() == 0 )
 			doc.setRawCommentText( "@see " + doc.overriddenClass().qualifiedTypeName() + "#" + Adapter.toString( doc ) );

@@ -171,60 +171,6 @@ public final class XMLWriter{
 		String get();
 	}
 
-	private interface StringDigester{
-
-		StringDigester Default = new StringDigester(){
-			public void digestString( String content, Appendable out ) throws IOException{
-				out.append( content );
-			}
-		};
-
-		StringDigester CDATA = new StringDigester(){
-			public void digestString( String content, Appendable out ) throws IOException{
-				out.append( "<![CDATA[" ).append( content ).append( "]]>" );
-			}
-		};
-
-		StringDigester XMLCharsFilter = new StringDigester(){
-
-			private final char[] charArray = new char[8192];
-
-			public void digestString( String content, Appendable out ) throws IOException{
-
-				int remainder = content.length();
-				int srcBegin = 0;
-
-				while( remainder > 0 ){
-					int copiedChars = Math.min( remainder, charArray.length );
-					content.getChars( srcBegin, srcBegin + copiedChars, charArray, 0 );
-					for( int i = 0; i < copiedChars; i++ )
-						switch( charArray[i] ){
-						case '&':
-							out.append( "&amp;" );
-							break;
-						case '<':
-							out.append( "&lt;" );
-							break;
-						case '>':
-							out.append( "&gt;" );
-							break;
-						case '\"':
-							out.append( "&quot;" );
-							break;
-						case '\'':
-							out.append( "&apos;" );
-							break;
-						default:
-							out.append( charArray[i] );
-						}
-					remainder -= copiedChars;
-				}
-			}
-		};
-
-		void digestString( String content, Appendable out ) throws IOException;
-	}
-
 	private static class Node{
 		public final String name;
 		public boolean isSingleLineNode;
@@ -457,7 +403,7 @@ public final class XMLWriter{
 		attributes.setLength( 0 );
 	}
 
-	private void write( String content, StringDigester digester ) throws IOException{
+	public void write( String content, StringDigester digester ) throws IOException{
 		hasContent = content != null && content.length() > 0;
 		if( hasContent ){
 			if( !isClosedStartNode ){
