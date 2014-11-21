@@ -1161,7 +1161,13 @@ public abstract class ClassBinding extends DocumentedElement{
 	 */
 	ClassBinding( Class<?> clazz, ClassDoc classDoc ){
 		super( Adapter.toString( clazz ), classDoc );
-		containingPackage = classDoc.containingPackage().name();
+		//FIXME
+		if( classDoc != null )
+			containingPackage = classDoc.containingPackage().name();
+		else{
+			Package p = clazz.getPackage();
+			containingPackage = ( p != null ? p.getName(): "" );
+		}
 		sortingName = Adapter.getSortingName( clazz );
 	}
 	
